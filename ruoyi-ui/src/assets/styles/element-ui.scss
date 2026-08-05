@@ -1,0 +1,340 @@
+// cover some element-ui styles
+
+.el-breadcrumb__inner,
+.el-breadcrumb__inner a {
+  font-weight: 400 !important;
+}
+
+.el-upload {
+  input[type="file"] {
+    display: none !important;
+  }
+}
+
+.el-upload__input {
+  display: none;
+}
+
+.cell {
+  .el-tag {
+    margin-right: 0px;
+  }
+}
+
+.small-padding {
+  .cell {
+    padding-left: 5px;
+    padding-right: 5px;
+  }
+}
+
+.fixed-width {
+  .el-button--mini {
+    padding: 7px 10px;
+    width: 60px;
+  }
+}
+
+.status-col {
+  .cell {
+    padding: 0 10px;
+    text-align: center;
+
+    .el-tag {
+      margin-right: 0px;
+    }
+  }
+}
+
+// to fixed https://github.com/ElemeFE/element/issues/2461
+.el-dialog {
+  transform: none;
+  left: 0;
+  position: relative;
+  margin: 0 auto;
+}
+
+// refine element ui upload
+.upload-container {
+  .el-upload {
+    width: 100%;
+
+    .el-upload-dragger {
+      width: 100%;
+      height: 200px;
+    }
+  }
+}
+
+// dropdown
+.el-dropdown-menu {
+  a {
+    display: block
+  }
+}
+
+// fix date-picker ui bug in filter-item
+.el-range-editor.el-input__inner {
+  display: inline-flex !important;
+}
+
+// to fix el-date-picker css style
+.el-range-separator {
+  box-sizing: content-box;
+}
+
+.el-menu--collapse
+  > div
+  > .el-submenu
+  > .el-submenu__title
+  .el-submenu__icon-arrow {
+  display: none;
+}
+
+/* ===== UI 美化：简洁深蓝 + 金色点缀 ===== */
+/* 主按钮跟随主题深蓝 */
+.el-button--primary {
+  background-color: #2b6de8;
+  border-color: #2b6de8;
+}
+.el-button--primary:hover,
+.el-button--primary:focus {
+  background-color: #1e5bb8;
+  border-color: #1e5bb8;
+}
+.el-button--primary.is-plain {
+  color: #2b6de8;
+  background-color: rgba(43, 109, 232, 0.08);
+  border-color: rgba(43, 109, 232, 0.5);
+}
+.el-button--primary.is-plain:hover,
+.el-button--primary.is-plain:focus {
+  background-color: #2b6de8;
+  border-color: #2b6de8;
+  color: #fff;
+}
+/* 统一圆角（简洁质感） */
+.el-card {
+  border-radius: 10px;
+}
+.el-dialog {
+  border-radius: 12px;
+}
+.el-table th {
+  background-color: #f5f7fa;
+  font-weight: 600;
+}
+/* 表格行 hover 柔和 */
+.el-table--enable-row-hover .el-table__body tr:hover > td {
+  background-color: rgba(43, 109, 232, 0.04);
+}
+/* 分页当前页 */
+.el-pagination.is-background .el-pager li.is-active {
+  background-color: #2b6de8;
+}
+
+/* ===== UI 美化 v2：完整组件覆盖（简洁深蓝 + 金色点缀）===== */
+/* 输入类组件 focus/悬停 */
+.el-input__inner:focus,
+.el-textarea__inner:focus,
+.el-select .el-input.is-focus .el-input__inner,
+.el-range-editor.is-active {
+  border-color: #2b6de8;
+}
+.el-input__inner:hover,
+.el-textarea__inner:hover {
+  border-color: #a3c0f5;
+}
+/* 下拉选中项 */
+.el-select-dropdown__item.selected {
+  color: #2b6de8;
+  font-weight: 600;
+}
+/* 单选/复选/开关 */
+.el-radio__input.is-checked .el-radio__inner {
+  background-color: #2b6de8;
+  border-color: #2b6de8;
+}
+.el-radio__input.is-checked + .el-radio__label {
+  color: #2b6de8;
+}
+.el-checkbox__input.is-checked .el-checkbox__inner {
+  background-color: #2b6de8;
+  border-color: #2b6de8;
+}
+.el-checkbox__input.is-checked + .el-checkbox__label {
+  color: #2b6de8;
+}
+.el-switch.is-checked .el-switch__core {
+  background-color: #2b6de8;
+  border-color: #2b6de8;
+}
+/* 标签圆角 */
+.el-tag {
+  border-radius: 4px;
+}
+/* 进度条渐变 */
+.el-progress-bar__inner {
+  background: linear-gradient(90deg, #2b6de8, #4a8af0);
+}
+/* 分页 hover */
+.el-pagination.is-background .el-pager li:hover {
+  color: #2b6de8;
+}
+.el-pagination.is-background .el-pager li.is-active:hover {
+  color: #fff;
+}
+/* 表格边框统一 */
+.el-table th,
+.el-table td {
+  border-bottom: 1px solid #eef1f6;
+}
+.el-table--border,
+.el-table--group {
+  border-color: #e4e9f2;
+}
+.el-table--border th,
+.el-table--border td {
+  border-right: 1px solid #eef1f6;
+}
+/* 卡片阴影柔和 */
+.el-card {
+  box-shadow: 0 2px 12px rgba(15, 28, 54, 0.06) !important;
+  transition: box-shadow 0.25s ease;
+}
+.el-card:hover {
+  box-shadow: 0 6px 20px rgba(15, 28, 54, 0.1) !important;
+}
+/* 按钮圆角 */
+.el-button {
+  border-radius: 6px;
+}
+/* 文字按钮（表格操作列：详情/编辑/删除等） */
+.el-button--text {
+  color: #2b6de8;
+}
+.el-button--text:hover,
+.el-button--text:focus {
+  color: #1e5bb8;
+}
+.el-button--text.is-plain:hover {
+  background-color: rgba(43, 109, 232, 0.06);
+}
+
+/* ===== 按钮统一深蓝色系（简洁风格）===== */
+/* 所有彩色按钮统一主题深蓝（success/warning/info/danger） */
+.el-button--success,
+.el-button--warning,
+.el-button--info,
+.el-button--danger {
+  background-color: #2b6de8 !important;
+  border-color: #2b6de8 !important;
+  color: #fff !important;
+}
+.el-button--success:hover,
+.el-button--success:focus,
+.el-button--warning:hover,
+.el-button--warning:focus,
+.el-button--info:hover,
+.el-button--info:focus,
+.el-button--danger:hover,
+.el-button--danger:focus {
+  background-color: #1e5bb8 !important;
+  border-color: #1e5bb8 !important;
+  color: #fff !important;
+}
+/* plain 批量按钮统一深蓝描边 */
+.el-button--success.is-plain,
+.el-button--warning.is-plain,
+.el-button--info.is-plain,
+.el-button--danger.is-plain {
+  color: #2b6de8 !important;
+  background-color: rgba(43, 109, 232, 0.08) !important;
+  border-color: rgba(43, 109, 232, 0.5) !important;
+}
+.el-button--success.is-plain:hover,
+.el-button--success.is-plain:focus,
+.el-button--warning.is-plain:hover,
+.el-button--warning.is-plain:focus,
+.el-button--info.is-plain:hover,
+.el-button--info.is-plain:focus,
+.el-button--danger.is-plain:hover,
+.el-button--danger.is-plain:focus {
+  background-color: #2b6de8 !important;
+  border-color: #2b6de8 !important;
+  color: #fff !important;
+}
+/* 文字删除按钮也统一深蓝 */
+.el-button--text.danger,
+.el-button--text.is-danger {
+  color: #2b6de8 !important;
+}
+.el-button--text.danger:hover {
+  color: #1e5bb8 !important;
+}
+
+/* ===== 标签（el-tag）蓝金同族色系 ===== */
+/* success（原绿色）→ 蓝色 */
+.el-tag.el-tag--success,
+.el-tag--success.el-tag--light,
+.el-tag--success.el-tag--plain {
+  background-color: rgba(43, 109, 232, 0.1) !important;
+  border-color: rgba(43, 109, 232, 0.35) !important;
+  color: #2b6de8 !important;
+}
+/* warning（原橙色）→ 金色 */
+.el-tag.el-tag--warning,
+.el-tag--warning.el-tag--light,
+.el-tag--warning.el-tag--plain {
+  background-color: rgba(227, 190, 90, 0.14) !important;
+  border-color: rgba(227, 190, 90, 0.5) !important;
+  color: #b8860b !important;
+}
+/* danger（原红色）→ 深金（警示感） */
+.el-tag.el-tag--danger,
+.el-tag--danger.el-tag--light,
+.el-tag--danger.el-tag--plain {
+  background-color: rgba(201, 154, 46, 0.12) !important;
+  border-color: rgba(201, 154, 46, 0.5) !important;
+  color: #a67c1e !important;
+}
+/* info（原灰色）→ 蓝灰 */
+.el-tag.el-tag--info,
+.el-tag--info.el-tag--light,
+.el-tag--info.el-tag--plain {
+  background-color: rgba(91, 143, 240, 0.08) !important;
+  border-color: rgba(91, 143, 240, 0.3) !important;
+  color: #4a6da7 !important;
+}
+/* 默认 tag → 蓝灰 */
+.el-tag {
+  background-color: rgba(43, 109, 232, 0.06) !important;
+  border-color: rgba(43, 109, 232, 0.2) !important;
+  color: #5a7cc0 !important;
+}
+/* 对话框标题金色点缀 */
+.el-dialog__header {
+  border-bottom: 1px solid #f0f2f7;
+  padding-bottom: 14px;
+}
+.el-dialog__title {
+  position: relative;
+  padding-left: 12px;
+  font-weight: 600;
+}
+.el-dialog__title::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 4px;
+  height: 16px;
+  border-radius: 2px;
+  background: linear-gradient(180deg, #e3be5a, #c99a2e);
+}
+/* 表单 label */
+.el-form-item__label {
+  color: #3d4a5d;
+  font-weight: 500;
+}

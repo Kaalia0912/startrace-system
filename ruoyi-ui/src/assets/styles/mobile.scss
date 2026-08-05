@@ -1,0 +1,73 @@
+/* ===== 手机端适配（≤768px）=====
+   注意：侧边栏抽屉由若依原生处理（ResizeHandler 992px 阈值 + hideSidebar 滑出/汉堡开合）
+   此处只补充内容区/组件适配
+*/
+@media screen and (max-width: 768px) {
+  /* 内容区紧凑 + 页面级横向滚动（表格用） */
+  .app-container {
+    padding: 10px !important;
+    overflow-x: auto !important;
+  }
+
+  /* 面包屑隐藏（省空间） */
+  .breadcrumb-container {
+    display: none !important;
+  }
+
+  /* 标签页横向滚动 */
+  .tags-view-container .tags-view-wrapper {
+    overflow-x: auto !important;
+  }
+
+  /* 所有 el-col 单列（统计卡片/图表/表单） */
+  .el-row .el-col {
+    width: 100% !important;
+    max-width: 100% !important;
+    flex: 0 0 100% !important;
+    margin-bottom: 10px;
+  }
+
+  /* 卡片内边距紧凑 */
+  .el-card__body {
+    padding: 12px !important;
+  }
+
+  /* 表格保持列宽（页面横向滚动查看） */
+  .el-table {
+    min-width: 760px !important;
+  }
+
+  /* 筛选区全宽 */
+  .filter-container .filter-item {
+    display: block !important;
+    width: 100% !important;
+    margin-right: 0 !important;
+  }
+  .filter-container .el-input,
+  .filter-container .el-select,
+  .filter-container .el-date-editor {
+    width: 100% !important;
+  }
+
+  /* 对话框适配 */
+  .el-dialog {
+    width: 94% !important;
+    margin-top: 4vh !important;
+  }
+  .el-message-box {
+    width: 88% !important;
+  }
+
+  /* 操作按钮间距 */
+  .el-button + .el-button {
+    margin-left: 6px !important;
+  }
+
+  /* 头部导航压缩 */
+  .navbar .right-menu {
+    margin-right: 6px !important;
+  }
+  .navbar .el-dropdown {
+    margin-left: 6px !important;
+  }
+}

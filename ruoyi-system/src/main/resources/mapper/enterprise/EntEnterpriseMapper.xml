@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.EntEnterpriseMapper">
+    
+    <resultMap type="EntEnterprise" id="EntEnterpriseResult">
+        <result property="entId"    column="ent_id"    />
+        <result property="entCode"    column="ent_code"    />
+        <result property="entName"    column="ent_name"    />
+        <result property="industry"    column="industry"    />
+        <result property="entType"    column="ent_type"    />
+        <result property="scale"    column="scale"    />
+        <result property="address"    column="address"    />
+        <result property="legalPerson"    column="legal_person"    />
+        <result property="phone"    column="phone"    />
+        <result property="email"    column="email"    />
+        <result property="establishDate"    column="establish_date"    />
+        <result property="registeredCapital"    column="registered_capital"    />
+        <result property="employeeCount"    column="employee_count"    />
+        <result property="status"    column="status"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="updateTime"    column="update_time"    />
+        <result property="remark"    column="remark"    />
+    </resultMap>
+
+    <sql id="selectEntEnterpriseVo">
+        select ent_id, ent_code, ent_name, industry, ent_type, scale, address, legal_person, phone, email, establish_date, registered_capital, employee_count, status, create_by, create_time, update_by, update_time, remark from ent_enterprise
+    </sql>
+
+    <select id="selectEntEnterpriseList" parameterType="EntEnterprise" resultMap="EntEnterpriseResult">
+        <include refid="selectEntEnterpriseVo"/>
+        <where>  
+            <if test="entCode != null  and entCode != ''"> and ent_code = #{entCode}</if>
+            <if test="entName != null  and entName != ''"> and ent_name like concat('%', #{entName}, '%')</if>
+            <if test="industry != null  and industry != ''"> and industry = #{industry}</if>
+            <if test="entType != null  and entType != ''"> and ent_type = #{entType}</if>
+            <if test="scale != null  and scale != ''"> and scale = #{scale}</if>
+            <if test="address != null  and address != ''"> and address = #{address}</if>
+            <if test="legalPerson != null  and legalPerson != ''"> and legal_person = #{legalPerson}</if>
+            <if test="phone != null  and phone != ''"> and phone = #{phone}</if>
+            <if test="email != null  and email != ''"> and email = #{email}</if>
+            <if test="establishDate != null "> and establish_date = #{establishDate}</if>
+            <if test="registeredCapital != null "> and registered_capital = #{registeredCapital}</if>
+            <if test="employeeCount != null "> and employee_count = #{employeeCount}</if>
+            <if test="status != null  and status != ''"> and status = #{status}</if>
+        </where>
+    </select>
+    
+    <select id="selectEntEnterpriseByEntId" parameterType="Long" resultMap="EntEnterpriseResult">
+        <include refid="selectEntEnterpriseVo"/>
+        where ent_id = #{entId}
+    </select>
+
+    <insert id="insertEntEnterprise" parameterType="EntEnterprise" useGeneratedKeys="true" keyProperty="entId">
+        insert into ent_enterprise
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="entCode != null and entCode != ''">ent_code,</if>
+            <if test="entName != null and entName != ''">ent_name,</if>
+            <if test="industry != null">industry,</if>
+            <if test="entType != null">ent_type,</if>
+            <if test="scale != null">scale,</if>
+            <if test="address != null">address,</if>
+            <if test="legalPerson != null">legal_person,</if>
+            <if test="phone != null">phone,</if>
+            <if test="email != null">email,</if>
+            <if test="establishDate != null">establish_date,</if>
+            <if test="registeredCapital != null">registered_capital,</if>
+            <if test="employeeCount != null">employee_count,</if>
+            <if test="status != null">status,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateBy != null">update_by,</if>
+            <if test="updateTime != null">update_time,</if>
+            <if test="remark != null">remark,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="entCode != null and entCode != ''">#{entCode},</if>
+            <if test="entName != null and entName != ''">#{entName},</if>
+            <if test="industry != null">#{industry},</if>
+            <if test="entType != null">#{entType},</if>
+            <if test="scale != null">#{scale},</if>
+            <if test="address != null">#{address},</if>
+            <if test="legalPerson != null">#{legalPerson},</if>
+            <if test="phone != null">#{phone},</if>
+            <if test="email != null">#{email},</if>
+            <if test="establishDate != null">#{establishDate},</if>
+            <if test="registeredCapital != null">#{registeredCapital},</if>
+            <if test="employeeCount != null">#{employeeCount},</if>
+            <if test="status != null">#{status},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateBy != null">#{updateBy},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+            <if test="remark != null">#{remark},</if>
+         </trim>
+    </insert>
+
+    <update id="updateEntEnterprise" parameterType="EntEnterprise">
+        update ent_enterprise
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="entCode != null and entCode != ''">ent_code = #{entCode},</if>
+            <if test="entName != null and entName != ''">ent_name = #{entName},</if>
+            <if test="industry != null">industry = #{industry},</if>
+            <if test="entType != null">ent_type = #{entType},</if>
+            <if test="scale != null">scale = #{scale},</if>
+            <if test="address != null">address = #{address},</if>
+            <if test="legalPerson != null">legal_person = #{legalPerson},</if>
+            <if test="phone != null">phone = #{phone},</if>
+            <if test="email != null">email = #{email},</if>
+            <if test="establishDate != null">establish_date = #{establishDate},</if>
+            <if test="registeredCapital != null">registered_capital = #{registeredCapital},</if>
+            <if test="employeeCount != null">employee_count = #{employeeCount},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="createBy != null">create_by = #{createBy},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+            <if test="remark != null">remark = #{remark},</if>
+        </trim>
+        where ent_id = #{entId}
+    </update>
+
+    <delete id="deleteEntEnterpriseByEntId" parameterType="Long">
+        delete from ent_enterprise where ent_id = #{entId}
+    </delete>
+
+    <delete id="deleteEntEnterpriseByEntIds" parameterType="String">
+        delete from ent_enterprise where ent_id in 
+        <foreach item="entId" collection="array" open="(" separator="," close=")">
+            #{entId}
+        </foreach>
+    </delete>
+
+    <select id="checkEntCodeUnique" parameterType="String" resultMap="EntEnterpriseResult">
+        <include refid="selectEntEnterpriseVo"/>
+        where ent_code = #{entCode} limit 1
+    </select>
+
+    <select id="selectCountByEntType" resultType="java.util.Map">
+        select ent_type as "name", count(*) as "value" from ent_enterprise group by ent_type
+    </select>
+
+    <select id="selectCountByIndustry" resultType="java.util.Map">
+        select industry as "name", count(*) as "value" from ent_enterprise group by industry
+    </select>
+
+    <select id="selectCountByScale" resultType="java.util.Map">
+        select scale as "name", count(*) as "value" from ent_enterprise group by scale
+    </select>
+
+    <select id="selectCountByStatus" resultType="java.util.Map">
+        select status as "name", count(*) as "value" from ent_enterprise group by status
+    </select>
+
+    <select id="selectSummary" resultType="java.util.Map">
+        select count(*) as total, ifnull(sum(registered_capital),0) as totalCapital, ifnull(round(avg(employee_count),0),0) as avgEmployee, count(distinct industry) as industryCount from ent_enterprise
+    </select>
+</mapper>

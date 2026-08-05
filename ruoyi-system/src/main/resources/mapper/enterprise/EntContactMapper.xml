@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.EntContactMapper">
+    
+    <resultMap type="EntContact" id="EntContactResult">
+        <result property="contactId"    column="contact_id"    />
+        <result property="entId"    column="ent_id"    />
+        <result property="contactName"    column="contact_name"    />
+        <result property="position"    column="position"    />
+        <result property="phone"    column="phone"    />
+        <result property="email"    column="email"    />
+        <result property="wechat"    column="wechat"    />
+        <result property="isMain"    column="is_main"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="updateTime"    column="update_time"    />
+        <result property="remark"    column="remark"    />
+    </resultMap>
+
+    <sql id="selectEntContactVo">
+        select c.contact_id, c.ent_id, e.ent_name, c.contact_name, c.position, c.phone, c.email, c.wechat, c.is_main, c.create_by, c.create_time, c.update_by, c.update_time, c.remark
+        from ent_contact c
+        left join ent_enterprise e on c.ent_id = e.ent_id
+    </sql>
+
+    <select id="selectEntContactList" parameterType="EntContact" resultMap="EntContactResult">
+        <include refid="selectEntContactVo"/>
+        <where>  
+            <if test="entId != null"> and c.ent_id = #{entId}</if>
+            <if test="contactName != null  and contactName != ''"> and c.contact_name like concat('%', #{contactName}, '%')</if>
+            <if test="position != null  and position != ''"> and c.position like concat('%', #{position}, '%')</if>
+            <if test="phone != null  and phone != ''"> and c.phone like concat('%', #{phone}, '%')</if>
+            <if test="isMain != null  and isMain != ''"> and c.is_main = #{isMain}</if>
+        </where>
+        order by c.create_time desc
+    </select>
+    
+    <select id="selectEntContactByEntId" parameterType="Long" resultMap="EntContactResult">
+        <include refid="selectEntContactVo"/>
+        where c.ent_id = #{entId}
+        order by c.is_main desc, c.create_time asc
+    </select>
+    
+    <select id="selectEntContactByContactId" parameterType="Long" resultMap="EntContactResult">
+        <include refid="selectEntContactVo"/>
+        where c.contact_id = #{contactId}
+    </select>
+        
+    <insert id="insertEntContact" parameterType="EntContact" useGeneratedKeys="true" keyProperty="contactId">
+        insert into ent_contact
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="entId != null">ent_id,</if>
+            <if test="contactName != null">contact_name,</if>
+            <if test="position != null">position,</if>
+            <if test="phone != null">phone,</if>
+            <if test="email != null">email,</if>
+            <if test="wechat != null">wechat,</if>
+            <if test="isMain != null">is_main,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="remark != null">remark,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="entId != null">#{entId},</if>
+            <if test="contactName != null">#{contactName},</if>
+            <if test="position != null">#{position},</if>
+            <if test="phone != null">#{phone},</if>
+            <if test="email != null">#{email},</if>
+            <if test="wechat != null">#{wechat},</if>
+            <if test="isMain != null">#{isMain},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="remark != null">#{remark},</if>
+         </trim>
+    </insert>
+
+    <update id="updateEntContact" parameterType="EntContact">
+        update ent_contact
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="entId != null">ent_id = #{entId},</if>
+            <if test="contactName != null">contact_name = #{contactName},</if>
+            <if test="position != null">position = #{position},</if>
+            <if test="phone != null">phone = #{phone},</if>
+            <if test="email != null">email = #{email},</if>
+            <if test="wechat != null">wechat = #{wechat},</if>
+            <if test="isMain != null">is_main = #{isMain},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+            <if test="remark != null">remark = #{remark},</if>
+        </trim>
+        where contact_id = #{contactId}
+    </update>
+
+    <delete id="deleteEntContactByContactIds" parameterType="String">
+        delete from ent_contact where contact_id in 
+        <foreach item="contactId" collection="array" open="(" separator="," close=")">
+            #{contactId}
+        </foreach>
+    </delete>
+
+    <delete id="deleteEntContactByEntId" parameterType="Long">
+        delete from ent_contact where ent_id = #{entId}
+    </delete>
+</mapper>
