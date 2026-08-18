@@ -99,7 +99,7 @@
 ### 2. 启动后端
 ```bash
 # 配置数据库连接（ruoyi-admin/src/main/resources/application-druid.yml）
-# 密码支持环境变量：DB_PASSWORD=你的密码
+# 密码通过环境变量 DB_PASSWORD 注入（不提交明文）
 mvn spring-boot:run
 # 默认端口 8080
 ```

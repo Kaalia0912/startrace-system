@@ -47,3 +47,7 @@ nbdist/
 !*/build/*.xml
 
 .git-old-backup/
+
+# 本地日志
+ruoyi-ui/*.log
+*.log
