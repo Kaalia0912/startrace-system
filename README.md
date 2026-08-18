@@ -89,17 +89,20 @@
 
 ### 1. 初始化数据库
 ```bash
-# 执行 sql/ 目录下的脚本（按顺序）：
-# ry_20260417.sql      基础框架表
-# ent_enterprise.sql   企业档案表
-# ent_mock_data.sql    模拟演示数据（41 家企业 / 74 联系人）
-# enterprise_ext_menu.sql / enterprise_menu_dict.sql  菜单与字典
+# 1) 创建数据库：CREATE DATABASE ry_vue CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+# 2) 按顺序执行 sql/ 目录下的脚本：
+#    ry_20260417.sql      基础框架表（含默认账号 admin / ry）
+#    ent_enterprise.sql   企业档案表
+#    ent_mock_data.sql    模拟演示数据（41 家企业 / 74 联系人）
+#    enterprise_ext_menu.sql / enterprise_menu_dict.sql  菜单与字典
+#    quartz.sql           定时任务表
 ```
 
 ### 2. 启动后端
 ```bash
-# 配置数据库连接（ruoyi-admin/src/main/resources/application-druid.yml）
-# 密码通过环境变量 DB_PASSWORD 注入（不提交明文）
+# 设置数据库密码环境变量（改成你自己的 MySQL 密码）：
+#   Windows (PowerShell):  $env:DB_PASSWORD="你的密码"
+#   Linux / macOS:         export DB_PASSWORD="你的密码"
 mvn spring-boot:run
 # 默认端口 8080
 ```
@@ -114,7 +117,8 @@ npm run dev
 
 ### 4. 访问系统
 - 地址：`http://localhost/`
-- 默认账号：`admin`（密码请自行修改）
+- **默认账号：`admin` / `admin123`**（首次登录后请立即修改密码）
+- 测试账号：`ry` / `admin123`
 
 ---
 

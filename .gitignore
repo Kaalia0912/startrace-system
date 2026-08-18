@@ -51,3 +51,6 @@ nbdist/
 # 本地日志
 ruoyi-ui/*.log
 *.log
+
+# 本地启动脚本（含个人路径）
+ruoyi-start.vbs
