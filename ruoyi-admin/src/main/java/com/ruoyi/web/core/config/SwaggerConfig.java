@@ -53,7 +53,7 @@ public class SwaggerConfig
     {
         return new Info()
             // 设置标题
-            .title("星穹企业管理系统_接口文档")
+            .title("星溯企业管理系统_接口文档")
             // 描述
             .description("企业档案管理系统接口文档")
             // 作者信息

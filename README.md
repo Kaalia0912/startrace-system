@@ -4,8 +4,8 @@
 <h1 align="center" style="margin: 30px 0 30px; font-weight: bold;">RuoYi v3.9.2</h1>
 <h4 align="center">基于SpringBoot+Vue前后端分离的Java快速开发框架</h4>
 <p align="center">
-	<a href="https://github.com/Kaalia0912/xingqiong-system/actions/workflows/build.yml"><img src="https://github.com/Kaalia0912/xingqiong-system/actions/workflows/build.yml/badge.svg" alt="Build and Test"></a>
-	<a href="https://github.com/Kaalia0912/xingqiong-system"><img src="https://img.shields.io/badge/星穹企业管理系统-定制版-blue.svg"></a>
+	<a href="https://github.com/Kaalia0912/startrace-system/actions/workflows/build.yml"><img src="https://github.com/Kaalia0912/startrace-system/actions/workflows/build.yml/badge.svg" alt="Build and Test"></a>
+	<a href="https://github.com/Kaalia0912/startrace-system"><img src="https://img.shields.io/badge/星溯企业管理系统-定制版-blue.svg"></a>
 </p>
 <p align="center">本项目基于 <a href="https://gitee.com/y_project/RuoYi-Vue">RuoYi-Vue</a> 二次开发，遵循 <a href="LICENSE">MIT 协议</a></p>
 <p align="center">
