@@ -103,6 +103,9 @@
 # 设置数据库密码环境变量（改成你自己的 MySQL 密码）：
 #   Windows (PowerShell):  $env:DB_PASSWORD="你的密码"
 #   Linux / macOS:         export DB_PASSWORD="你的密码"
+# 设置 JWT 签名密钥环境变量（改成你自己的随机密钥，切勿使用示例值）：
+#   Windows (PowerShell):  $env:JWT_SECRET="一串足够长的随机字符"
+#   Linux / macOS:         export JWT_SECRET="一串足够长的随机字符"
 mvn spring-boot:run
 # 默认端口 8080
 ```
