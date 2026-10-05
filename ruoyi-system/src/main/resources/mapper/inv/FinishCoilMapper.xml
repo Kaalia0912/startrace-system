@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.FinishCoilMapper">
+
+    <resultMap type="FinishCoil" id="FinishCoilResult">
+        <result property="coilId"       column="coil_id"       />
+        <result property="coilNo"       column="coil_no"       />
+        <result property="labelNo"      column="label_no"      />
+        <result property="orderNo"      column="order_no"      />
+        <result property="customerName" column="customer_name" />
+        <result property="materialCode" column="material_code" />
+        <result property="productName"  column="product_name"  />
+        <result property="material"     column="material"      />
+        <result property="spec"         column="spec"          />
+        <result property="hardness"     column="hardness"      />
+        <result property="surfaceRa"    column="surface_ra"    />
+        <result property="netWeight"    column="net_weight"    />
+        <result property="pieces"       column="pieces"        />
+        <result property="produceDate"  column="produce_date"  />
+        <result property="checker"      column="checker"       />
+        <result property="location"     column="location"      />
+        <result property="inDate"       column="in_date"       />
+        <result property="coilStatus"   column="coil_status"   />
+        <result property="createBy"     column="create_by"     />
+        <result property="createTime"   column="create_time"   />
+        <result property="updateBy"     column="update_by"     />
+        <result property="updateTime"   column="update_time"   />
+        <result property="remark"       column="remark"        />
+    </resultMap>
+
+    <sql id="selectFinishCoilVo">
+        select coil_id, coil_no, label_no, order_no, customer_name, material_code, product_name,
+               material, spec, hardness, surface_ra, net_weight, pieces, produce_date, checker,
+               location, in_date, coil_status, create_by, create_time, update_by, update_time, remark
+        from inv_finish_coil
+    </sql>
+
+    <select id="selectFinishCoilList" parameterType="FinishCoil" resultMap="FinishCoilResult">
+        <include refid="selectFinishCoilVo"/>
+        <where>
+            <if test="coilNo != null  and coilNo != ''"> and coil_no like concat('%', #{coilNo}, '%')</if>
+            <if test="orderNo != null  and orderNo != ''"> and order_no like concat('%', #{orderNo}, '%')</if>
+            <if test="customerName != null  and customerName != ''"> and customer_name like concat('%', #{customerName}, '%')</if>
+            <if test="materialCode != null  and materialCode != ''"> and material_code like concat('%', #{materialCode}, '%')</if>
+            <if test="material != null  and material != ''"> and material like concat('%', #{material}, '%')</if>
+            <if test="coilStatus != null  and coilStatus != ''"> and coil_status = #{coilStatus}</if>
+        </where>
+        order by in_date desc, coil_id desc
+    </select>
+
+    <select id="selectFinishCoilByCoilId" parameterType="Long" resultMap="FinishCoilResult">
+        <include refid="selectFinishCoilVo"/>
+        where coil_id = #{coilId}
+    </select>
+
+    <select id="selectFinishCoilByCoilIds" parameterType="String" resultMap="FinishCoilResult">
+        <include refid="selectFinishCoilVo"/>
+        where coil_id in
+        <foreach item="coilId" collection="array" open="(" separator="," close=")">
+            #{coilId}
+        </foreach>
+        order by coil_id
+    </select>
+
+    <select id="checkCoilNoUnique" parameterType="String" resultMap="FinishCoilResult">
+        <include refid="selectFinishCoilVo"/>
+        where coil_no = #{coilNo} limit 1
+    </select>
+
+    <insert id="insertFinishCoil" parameterType="FinishCoil" useGeneratedKeys="true" keyProperty="coilId">
+        insert into inv_finish_coil
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="coilNo != null and coilNo != ''">coil_no,</if>
+            <if test="labelNo != null">label_no,</if>
+            <if test="orderNo != null">order_no,</if>
+            <if test="customerName != null">customer_name,</if>
+            <if test="materialCode != null">material_code,</if>
+            <if test="productName != null">product_name,</if>
+            <if test="material != null">material,</if>
+            <if test="spec != null">spec,</if>
+            <if test="hardness != null">hardness,</if>
+            <if test="surfaceRa != null">surface_ra,</if>
+            <if test="netWeight != null">net_weight,</if>
+            <if test="pieces != null">pieces,</if>
+            <if test="produceDate != null">produce_date,</if>
+            <if test="checker != null">checker,</if>
+            <if test="location != null">location,</if>
+            <if test="inDate != null">in_date,</if>
+            <if test="coilStatus != null">coil_status,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="remark != null">remark,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="coilNo != null and coilNo != ''">#{coilNo},</if>
+            <if test="labelNo != null">#{labelNo},</if>
+            <if test="orderNo != null">#{orderNo},</if>
+            <if test="customerName != null">#{customerName},</if>
+            <if test="materialCode != null">#{materialCode},</if>
+            <if test="productName != null">#{productName},</if>
+            <if test="material != null">#{material},</if>
+            <if test="spec != null">#{spec},</if>
+            <if test="hardness != null">#{hardness},</if>
+            <if test="surfaceRa != null">#{surfaceRa},</if>
+            <if test="netWeight != null">#{netWeight},</if>
+            <if test="pieces != null">#{pieces},</if>
+            <if test="produceDate != null">#{produceDate},</if>
+            <if test="checker != null">#{checker},</if>
+            <if test="location != null">#{location},</if>
+            <if test="inDate != null">#{inDate},</if>
+            <if test="coilStatus != null">#{coilStatus},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="remark != null">#{remark},</if>
+        </trim>
+    </insert>
+
+    <update id="updateFinishCoil" parameterType="FinishCoil">
+        update inv_finish_coil
+        set coil_no = #{coilNo},
+            label_no = #{labelNo},
+            order_no = #{orderNo},
+            customer_name = #{customerName},
+            material_code = #{materialCode},
+            product_name = #{productName},
+            material = #{material},
+            spec = #{spec},
+            hardness = #{hardness},
+            surface_ra = #{surfaceRa},
+            net_weight = #{netWeight},
+            pieces = #{pieces},
+            produce_date = #{produceDate},
+            checker = #{checker},
+            location = #{location},
+            in_date = #{inDate},
+            coil_status = #{coilStatus},
+            remark = #{remark},
+            update_by = #{updateBy},
+            update_time = sysdate()
+        where coil_id = #{coilId}
+    </update>
+
+    <update id="updateShipStatusByCoilIds">
+        update inv_finish_coil
+        set coil_status = '1',
+            update_by = #{updateBy},
+            update_time = sysdate()
+        where coil_id in
+        <foreach item="coilId" collection="coilIds" open="(" separator="," close=")">
+            #{coilId}
+        </foreach>
+    </update>
+
+    <delete id="deleteFinishCoilByCoilIds" parameterType="String">
+        delete from inv_finish_coil where coil_id in
+        <foreach item="coilId" collection="array" open="(" separator="," close=")">
+            #{coilId}
+        </foreach>
+    </delete>
+</mapper>

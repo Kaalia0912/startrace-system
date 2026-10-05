@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.ShipmentMapper">
+
+    <resultMap type="Shipment" id="ShipmentResult">
+        <result property="shipmentId"   column="shipment_id"   />
+        <result property="shipmentNo"   column="shipment_no"   />
+        <result property="customerName" column="customer_name" />
+        <result property="orderNo"      column="order_no"      />
+        <result property="address"      column="address"       />
+        <result property="receiver"     column="receiver"      />
+        <result property="phone"        column="phone"         />
+        <result property="shipmentDate" column="shipment_date" />
+        <result property="totalWeight"  column="total_weight"  />
+        <result property="totalPieces"  column="total_pieces"  />
+        <result property="status"       column="status"        />
+        <result property="createBy"     column="create_by"     />
+        <result property="createTime"   column="create_time"   />
+        <result property="updateBy"     column="update_by"     />
+        <result property="updateTime"   column="update_time"   />
+        <result property="remark"       column="remark"        />
+    </resultMap>
+
+    <resultMap type="Shipment" id="ShipmentDetailResult" extends="ShipmentResult">
+        <collection property="items" ofType="ShipmentItem" javaType="java.util.List">
+            <id     property="itemId"       column="item_id"        />
+            <result property="shipmentId"   column="item_shipment_id" />
+            <result property="coilNo"       column="item_coil_no"   />
+            <result property="materialCode" column="item_material_code" />
+            <result property="productName"  column="item_product_name" />
+            <result property="spec"         column="item_spec"      />
+            <result property="netWeight"    column="item_net_weight" />
+            <result property="pieces"       column="item_pieces"    />
+        </collection>
+    </resultMap>
+
+    <sql id="selectShipmentVo">
+        select shipment_id, shipment_no, customer_name, order_no, address, receiver, phone,
+               shipment_date, total_weight, total_pieces, status,
+               create_by, create_time, update_by, update_time, remark
+        from inv_shipment
+    </sql>
+
+    <select id="selectShipmentList" parameterType="Shipment" resultMap="ShipmentResult">
+        <include refid="selectShipmentVo"/>
+        <where>
+            <if test="shipmentNo != null  and shipmentNo != ''"> and shipment_no like concat('%', #{shipmentNo}, '%')</if>
+            <if test="customerName != null  and customerName != ''"> and customer_name like concat('%', #{customerName}, '%')</if>
+            <if test="orderNo != null  and orderNo != ''"> and order_no like concat('%', #{orderNo}, '%')</if>
+            <if test="status != null  and status != ''"> and status = #{status}</if>
+        </where>
+        order by shipment_date desc, shipment_id desc
+    </select>
+
+    <select id="selectShipmentByShipmentId" parameterType="Long" resultMap="ShipmentDetailResult">
+        select s.shipment_id, s.shipment_no, s.customer_name, s.order_no, s.address, s.receiver, s.phone,
+               s.shipment_date, s.total_weight, s.total_pieces, s.status,
+               s.create_by, s.create_time, s.update_by, s.update_time, s.remark,
+               i.item_id          as item_id,
+               i.shipment_id      as item_shipment_id,
+               i.coil_no          as item_coil_no,
+               i.material_code    as item_material_code,
+               i.product_name     as item_product_name,
+               i.spec             as item_spec,
+               i.net_weight       as item_net_weight,
+               i.pieces           as item_pieces
+        from inv_shipment s
+        left join inv_shipment_item i on i.shipment_id = s.shipment_id
+        where s.shipment_id = #{shipmentId}
+        order by i.item_id
+    </select>
+
+    <insert id="insertShipment" parameterType="Shipment" useGeneratedKeys="true" keyProperty="shipmentId">
+        insert into inv_shipment
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="shipmentNo != null and shipmentNo != ''">shipment_no,</if>
+            <if test="customerName != null">customer_name,</if>
+            <if test="orderNo != null">order_no,</if>
+            <if test="address != null">address,</if>
+            <if test="receiver != null">receiver,</if>
+            <if test="phone != null">phone,</if>
+            <if test="shipmentDate != null">shipment_date,</if>
+            <if test="totalWeight != null">total_weight,</if>
+            <if test="totalPieces != null">total_pieces,</if>
+            <if test="status != null">status,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="remark != null">remark,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="shipmentNo != null and shipmentNo != ''">#{shipmentNo},</if>
+            <if test="customerName != null">#{customerName},</if>
+            <if test="orderNo != null">#{orderNo},</if>
+            <if test="address != null">#{address},</if>
+            <if test="receiver != null">#{receiver},</if>
+            <if test="phone != null">#{phone},</if>
+            <if test="shipmentDate != null">#{shipmentDate},</if>
+            <if test="totalWeight != null">#{totalWeight},</if>
+            <if test="totalPieces != null">#{totalPieces},</if>
+            <if test="status != null">#{status},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="remark != null">#{remark},</if>
+        </trim>
+    </insert>
+
+    <insert id="insertShipmentItem" parameterType="ShipmentItem" useGeneratedKeys="true" keyProperty="itemId">
+        insert into inv_shipment_item (shipment_id, coil_no, material_code, product_name, spec, net_weight, pieces)
+        values (#{shipmentId}, #{coilNo}, #{materialCode}, #{productName}, #{spec}, #{netWeight}, #{pieces})
+    </insert>
+
+    <update id="updateShipment" parameterType="Shipment">
+        update inv_shipment
+        <set>
+            <if test="customerName != null">customer_name = #{customerName},</if>
+            <if test="orderNo != null">order_no = #{orderNo},</if>
+            <if test="address != null">address = #{address},</if>
+            <if test="receiver != null">receiver = #{receiver},</if>
+            <if test="phone != null">phone = #{phone},</if>
+            <if test="shipmentDate != null">shipment_date = #{shipmentDate},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="remark != null">remark = #{remark},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            update_time = sysdate()
+        </set>
+        where shipment_id = #{shipmentId}
+    </update>
+
+    <delete id="deleteShipmentByShipmentIds" parameterType="String">
+        delete from inv_shipment where shipment_id in
+        <foreach item="shipmentId" collection="array" open="(" separator="," close=")">
+            #{shipmentId}
+        </foreach>
+    </delete>
+
+    <delete id="deleteShipmentItemByShipmentIds" parameterType="String">
+        delete from inv_shipment_item where shipment_id in
+        <foreach item="shipmentId" collection="array" open="(" separator="," close=")">
+            #{shipmentId}
+        </foreach>
+    </delete>
+</mapper>
