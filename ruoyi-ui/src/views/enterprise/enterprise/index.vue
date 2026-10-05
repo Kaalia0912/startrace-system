@@ -230,6 +230,34 @@
         <el-form-item label="注册地址" prop="address">
           <el-input v-model="form.address" type="textarea" placeholder="请输入注册地址" />
         </el-form-item>
+        <el-divider content-position="left">开票与账期（对接客户时用）</el-divider>
+        <el-form-item label="开票抬头" prop="invoiceTitle">
+          <el-input v-model="form.invoiceTitle" placeholder="留空默认取企业名称" />
+        </el-form-item>
+        <el-form-item label="税号" prop="taxNo">
+          <el-input v-model="form.taxNo" placeholder="请输入纳税人识别号" />
+        </el-form-item>
+        <el-form-item label="开票地址" prop="invoiceAddress">
+          <el-input v-model="form.invoiceAddress" placeholder="请输入开票地址" />
+        </el-form-item>
+        <el-form-item label="开票电话" prop="invoicePhone">
+          <el-input v-model="form.invoicePhone" placeholder="请输入开票电话" />
+        </el-form-item>
+        <el-form-item label="开户行" prop="bankName">
+          <el-input v-model="form.bankName" placeholder="请输入开户银行" />
+        </el-form-item>
+        <el-form-item label="银行账号" prop="bankAccount">
+          <el-input v-model="form.bankAccount" placeholder="请输入银行账号" />
+        </el-form-item>
+        <el-form-item label="账期(天)" prop="paymentDays">
+          <el-input-number v-model="form.paymentDays" :precision="0" :min="0" :max="365" controls-position="right" style="width: 200px" />
+        </el-form-item>
+        <el-form-item label="信用额度(元)" prop="creditLimit">
+          <el-input-number v-model="form.creditLimit" :precision="2" :min="0" controls-position="right" style="width: 200px" />
+        </el-form-item>
+        <el-form-item label="默认收货地址" prop="defaultAddress">
+          <el-input v-model="form.defaultAddress" type="textarea" placeholder="发货时默认带出的地址" />
+        </el-form-item>
         <el-form-item label="备注" prop="remark">
           <el-input v-model="form.remark" type="textarea" placeholder="请输入备注" />
         </el-form-item>

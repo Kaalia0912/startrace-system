@@ -18,8 +18,17 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="establishDate"    column="establish_date"    />
         <result property="registeredCapital"    column="registered_capital"    />
         <result property="employeeCount"    column="employee_count"    />
-        <result property="status"    column="status"    />
-        <result property="createBy"    column="create_by"    />
+       <result property="status"    column="status"    />
+        <result property="invoiceTitle"    column="invoice_title"    />
+        <result property="taxNo"    column="tax_no"    />
+        <result property="invoiceAddress"    column="invoice_address"    />
+        <result property="invoicePhone"    column="invoice_phone"    />
+        <result property="bankName"    column="bank_name"    />
+        <result property="bankAccount"    column="bank_account"    />
+        <result property="paymentDays"    column="payment_days"    />
+        <result property="creditLimit"    column="credit_limit"    />
+        <result property="defaultAddress"    column="default_address"    />
+       <result property="createBy"    column="create_by"    />
         <result property="createTime"    column="create_time"    />
         <result property="updateBy"    column="update_by"    />
         <result property="updateTime"    column="update_time"    />
@@ -27,7 +36,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </resultMap>
 
     <sql id="selectEntEnterpriseVo">
-        select ent_id, ent_code, ent_name, industry, ent_type, scale, address, legal_person, phone, email, establish_date, registered_capital, employee_count, status, create_by, create_time, update_by, update_time, remark from ent_enterprise
+        select ent_id, ent_code, ent_name, industry, ent_type, scale, address, legal_person, phone, email, establish_date, registered_capital, employee_count, status, invoice_title, tax_no, invoice_address, invoice_phone, bank_name, bank_account, payment_days, credit_limit, default_address, create_by, create_time, update_by, update_time, remark from ent_enterprise
     </sql>
 
     <select id="selectEntEnterpriseList" parameterType="EntEnterprise" resultMap="EntEnterpriseResult">
@@ -69,8 +78,17 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="establishDate != null">establish_date,</if>
             <if test="registeredCapital != null">registered_capital,</if>
             <if test="employeeCount != null">employee_count,</if>
-            <if test="status != null">status,</if>
-            <if test="createBy != null">create_by,</if>
+           <if test="status != null">status,</if>
+            <if test="invoiceTitle != null">invoice_title,</if>
+            <if test="taxNo != null">tax_no,</if>
+            <if test="invoiceAddress != null">invoice_address,</if>
+            <if test="invoicePhone != null">invoice_phone,</if>
+            <if test="bankName != null">bank_name,</if>
+            <if test="bankAccount != null">bank_account,</if>
+            <if test="paymentDays != null">payment_days,</if>
+            <if test="creditLimit != null">credit_limit,</if>
+            <if test="defaultAddress != null">default_address,</if>
+           <if test="createBy != null">create_by,</if>
             <if test="createTime != null">create_time,</if>
             <if test="updateBy != null">update_by,</if>
             <if test="updateTime != null">update_time,</if>
@@ -89,8 +107,17 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="establishDate != null">#{establishDate},</if>
             <if test="registeredCapital != null">#{registeredCapital},</if>
             <if test="employeeCount != null">#{employeeCount},</if>
-            <if test="status != null">#{status},</if>
-            <if test="createBy != null">#{createBy},</if>
+           <if test="status != null">#{status},</if>
+            <if test="invoiceTitle != null">#{invoiceTitle},</if>
+            <if test="taxNo != null">#{taxNo},</if>
+            <if test="invoiceAddress != null">#{invoiceAddress},</if>
+            <if test="invoicePhone != null">#{invoicePhone},</if>
+            <if test="bankName != null">#{bankName},</if>
+            <if test="bankAccount != null">#{bankAccount},</if>
+            <if test="paymentDays != null">#{paymentDays},</if>
+            <if test="creditLimit != null">#{creditLimit},</if>
+            <if test="defaultAddress != null">#{defaultAddress},</if>
+           <if test="createBy != null">#{createBy},</if>
             <if test="createTime != null">#{createTime},</if>
             <if test="updateBy != null">#{updateBy},</if>
             <if test="updateTime != null">#{updateTime},</if>
@@ -113,8 +140,17 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="establishDate != null">establish_date = #{establishDate},</if>
             <if test="registeredCapital != null">registered_capital = #{registeredCapital},</if>
             <if test="employeeCount != null">employee_count = #{employeeCount},</if>
-            <if test="status != null">status = #{status},</if>
-            <if test="createBy != null">create_by = #{createBy},</if>
+           <if test="status != null">status = #{status},</if>
+            <if test="invoiceTitle != null">invoice_title = #{invoiceTitle},</if>
+            <if test="taxNo != null">tax_no = #{taxNo},</if>
+            <if test="invoiceAddress != null">invoice_address = #{invoiceAddress},</if>
+            <if test="invoicePhone != null">invoice_phone = #{invoicePhone},</if>
+            <if test="bankName != null">bank_name = #{bankName},</if>
+            <if test="bankAccount != null">bank_account = #{bankAccount},</if>
+            <if test="paymentDays != null">payment_days = #{paymentDays},</if>
+            <if test="creditLimit != null">credit_limit = #{creditLimit},</if>
+            <if test="defaultAddress != null">default_address = #{defaultAddress},</if>
+           <if test="createBy != null">create_by = #{createBy},</if>
             <if test="createTime != null">create_time = #{createTime},</if>
             <if test="updateBy != null">update_by = #{updateBy},</if>
             <if test="updateTime != null">update_time = #{updateTime},</if>

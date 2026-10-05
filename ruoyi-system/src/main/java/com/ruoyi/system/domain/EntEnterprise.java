@@ -69,7 +69,34 @@ public class EntEnterprise extends BaseEntity
 
     /** 状态（0在营 1注销） */
     @Excel(name = "状态", readConverterExp = "0=在营,1=注销")
-    private String status;
+   private String status;
+
+    /** 开票抬头 */
+    private String invoiceTitle;
+
+    /** 税号 */
+    private String taxNo;
+
+    /** 开票地址 */
+    private String invoiceAddress;
+
+    /** 开票电话 */
+    private String invoicePhone;
+
+    /** 开户行 */
+    private String bankName;
+
+    /** 银行账号 */
+    private String bankAccount;
+
+    /** 账期(天) */
+    private Integer paymentDays;
+
+    /** 信用额度(元) */
+    private java.math.BigDecimal creditLimit;
+
+    /** 默认收货地址 */
+    private String defaultAddress;
 
     public void setEntId(Long entId) 
     {
@@ -209,5 +236,95 @@ public class EntEnterprise extends BaseEntity
     public String getStatus() 
     {
         return status;
+    }
+
+    public String getInvoiceTitle() 
+    {
+        return invoiceTitle;
+    }
+
+    public void setInvoiceTitle(String invoiceTitle) 
+    {
+        this.invoiceTitle = invoiceTitle;
+    }
+
+    public String getTaxNo() 
+    {
+        return taxNo;
+    }
+
+    public void setTaxNo(String taxNo) 
+    {
+        this.taxNo = taxNo;
+    }
+
+    public String getInvoiceAddress() 
+    {
+        return invoiceAddress;
+    }
+
+    public void setInvoiceAddress(String invoiceAddress) 
+    {
+        this.invoiceAddress = invoiceAddress;
+    }
+
+    public String getInvoicePhone() 
+    {
+        return invoicePhone;
+    }
+
+    public void setInvoicePhone(String invoicePhone) 
+    {
+        this.invoicePhone = invoicePhone;
+    }
+
+    public String getBankName() 
+    {
+        return bankName;
+    }
+
+    public void setBankName(String bankName) 
+    {
+        this.bankName = bankName;
+    }
+
+    public String getBankAccount() 
+    {
+        return bankAccount;
+    }
+
+    public void setBankAccount(String bankAccount) 
+    {
+        this.bankAccount = bankAccount;
+    }
+
+    public Integer getPaymentDays() 
+    {
+        return paymentDays;
+    }
+
+    public void setPaymentDays(Integer paymentDays) 
+    {
+        this.paymentDays = paymentDays;
+    }
+
+    public java.math.BigDecimal getCreditLimit() 
+    {
+        return creditLimit;
+    }
+
+    public void setCreditLimit(java.math.BigDecimal creditLimit) 
+    {
+        this.creditLimit = creditLimit;
+    }
+
+    public String getDefaultAddress() 
+    {
+        return defaultAddress;
+    }
+
+    public void setDefaultAddress(String defaultAddress) 
+    {
+        this.defaultAddress = defaultAddress;
     }
 }
