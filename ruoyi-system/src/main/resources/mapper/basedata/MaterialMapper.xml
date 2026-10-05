@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.MaterialMapper">
+
+    <resultMap type="Material" id="MaterialResult">
+        <result property="materialId"       column="material_id"       />
+        <result property="materialCode"     column="material_code"     />
+        <result property="productName"      column="product_name"      />
+        <result property="material"         column="material"          />
+        <result property="spec"             column="spec"              />
+        <result property="thickness"        column="thickness"         />
+        <result property="width"            column="width"             />
+        <result property="coilInnerDia"     column="coil_inner_dia"    />
+        <result property="unit"             column="unit"              />
+        <result property="standard"         column="standard"          />
+        <result property="hardness"         column="hardness"          />
+        <result property="tensileStrength"  column="tensile_strength"  />
+        <result property="surfaceRa"        column="surface_ra"        />
+        <result property="coilWeightMin"    column="coil_weight_min"   />
+        <result property="coilWeightMax"    column="coil_weight_max"   />
+        <result property="packageCode"      column="package_code"      />
+        <result property="rawPrice"         column="raw_price"         />
+        <result property="status"           column="status"            />
+        <result property="createBy"         column="create_by"         />
+        <result property="createTime"       column="create_time"       />
+        <result property="updateBy"         column="update_by"         />
+        <result property="updateTime"       column="update_time"       />
+        <result property="remark"           column="remark"            />
+    </resultMap>
+
+    <sql id="selectMaterialVo">
+        select material_id, material_code, product_name, material, spec, thickness, width,
+               coil_inner_dia, unit, standard, hardness, tensile_strength, surface_ra,
+               coil_weight_min, coil_weight_max, package_code, raw_price, status,
+               create_by, create_time, update_by, update_time, remark
+        from md_material
+    </sql>
+
+    <select id="selectMaterialList" parameterType="Material" resultMap="MaterialResult">
+        <include refid="selectMaterialVo"/>
+        <where>
+            <if test="materialCode != null  and materialCode != ''"> and material_code like concat('%', #{materialCode}, '%')</if>
+            <if test="productName != null  and productName != ''"> and product_name like concat('%', #{productName}, '%')</if>
+            <if test="material != null  and material != ''"> and material like concat('%', #{material}, '%')</if>
+            <if test="spec != null  and spec != ''"> and spec like concat('%', #{spec}, '%')</if>
+            <if test="standard != null  and standard != ''"> and standard = #{standard}</if>
+            <if test="status != null  and status != ''"> and status = #{status}</if>
+        </where>
+        order by material_code
+    </select>
+
+    <select id="selectMaterialByMaterialId" parameterType="Long" resultMap="MaterialResult">
+        <include refid="selectMaterialVo"/>
+        where material_id = #{materialId}
+    </select>
+
+    <select id="checkMaterialCodeUnique" parameterType="String" resultMap="MaterialResult">
+        <include refid="selectMaterialVo"/>
+        where material_code = #{materialCode} limit 1
+    </select>
+
+    <insert id="insertMaterial" parameterType="Material" useGeneratedKeys="true" keyProperty="materialId">
+        insert into md_material
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="materialCode != null and materialCode != ''">material_code,</if>
+            <if test="productName != null">product_name,</if>
+            <if test="material != null">material,</if>
+            <if test="spec != null">spec,</if>
+            <if test="thickness != null">thickness,</if>
+            <if test="width != null">width,</if>
+            <if test="coilInnerDia != null">coil_inner_dia,</if>
+            <if test="unit != null">unit,</if>
+            <if test="standard != null">standard,</if>
+            <if test="hardness != null">hardness,</if>
+            <if test="tensileStrength != null">tensile_strength,</if>
+            <if test="surfaceRa != null">surface_ra,</if>
+            <if test="coilWeightMin != null">coil_weight_min,</if>
+            <if test="coilWeightMax != null">coil_weight_max,</if>
+            <if test="packageCode != null">package_code,</if>
+            <if test="rawPrice != null">raw_price,</if>
+            <if test="status != null">status,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="remark != null">remark,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="materialCode != null and materialCode != ''">#{materialCode},</if>
+            <if test="productName != null">#{productName},</if>
+            <if test="material != null">#{material},</if>
+            <if test="spec != null">#{spec},</if>
+            <if test="thickness != null">#{thickness},</if>
+            <if test="width != null">#{width},</if>
+            <if test="coilInnerDia != null">#{coilInnerDia},</if>
+            <if test="unit != null">#{unit},</if>
+            <if test="standard != null">#{standard},</if>
+            <if test="hardness != null">#{hardness},</if>
+            <if test="tensileStrength != null">#{tensileStrength},</if>
+            <if test="surfaceRa != null">#{surfaceRa},</if>
+            <if test="coilWeightMin != null">#{coilWeightMin},</if>
+            <if test="coilWeightMax != null">#{coilWeightMax},</if>
+            <if test="packageCode != null">#{packageCode},</if>
+            <if test="rawPrice != null">#{rawPrice},</if>
+            <if test="status != null">#{status},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="remark != null">#{remark},</if>
+        </trim>
+    </insert>
+
+    <update id="updateMaterial" parameterType="Material">
+        update md_material
+        set material_code = #{materialCode},
+            product_name = #{productName},
+            material = #{material},
+            spec = #{spec},
+            thickness = #{thickness},
+            width = #{width},
+            coil_inner_dia = #{coilInnerDia},
+            unit = #{unit},
+            standard = #{standard},
+            hardness = #{hardness},
+            tensile_strength = #{tensileStrength},
+            surface_ra = #{surfaceRa},
+            coil_weight_min = #{coilWeightMin},
+            coil_weight_max = #{coilWeightMax},
+            package_code = #{packageCode},
+            raw_price = #{rawPrice},
+            status = #{status},
+            remark = #{remark},
+            update_by = #{updateBy},
+            update_time = sysdate()
+        where material_id = #{materialId}
+    </update>
+
+    <delete id="deleteMaterialByMaterialId" parameterType="Long">
+        delete from md_material where material_id = #{materialId}
+    </delete>
+
+    <delete id="deleteMaterialByMaterialIds" parameterType="String">
+        delete from md_material where material_id in
+        <foreach item="materialId" collection="array" open="(" separator="," close=")">
+            #{materialId}
+        </foreach>
+    </delete>
+</mapper>

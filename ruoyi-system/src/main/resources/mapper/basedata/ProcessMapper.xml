@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.ProcessMapper">
+
+    <resultMap type="com.ruoyi.system.domain.Process" id="ProcessResult">
+        <result property="processId"   column="process_id"   />
+        <result property="processNo"   column="process_no"   />
+        <result property="processName" column="process_name" />
+        <result property="isQc"        column="is_qc"        />
+        <result property="status"      column="status"       />
+        <result property="createBy"    column="create_by"    />
+        <result property="createTime"  column="create_time"  />
+        <result property="updateBy"    column="update_by"    />
+        <result property="updateTime"  column="update_time"  />
+        <result property="remark"      column="remark"       />
+    </resultMap>
+
+    <sql id="selectProcessVo">
+        select process_id, process_no, process_name, is_qc, status,
+               create_by, create_time, update_by, update_time, remark
+        from md_process
+    </sql>
+
+    <select id="selectProcessList" parameterType="com.ruoyi.system.domain.Process" resultMap="ProcessResult">
+        <include refid="selectProcessVo"/>
+        <where>
+            <if test="processName != null  and processName != ''"> and process_name like concat('%', #{processName}, '%')</if>
+            <if test="processNo != null"> and process_no = #{processNo}</if>
+            <if test="isQc != null  and isQc != ''"> and is_qc = #{isQc}</if>
+            <if test="status != null  and status != ''"> and status = #{status}</if>
+        </where>
+        order by process_no
+    </select>
+
+    <select id="selectProcessByProcessId" parameterType="Long" resultMap="ProcessResult">
+        <include refid="selectProcessVo"/>
+        where process_id = #{processId}
+    </select>
+
+    <select id="checkProcessNoUnique" parameterType="Integer" resultMap="ProcessResult">
+        <include refid="selectProcessVo"/>
+        where process_no = #{processNo} limit 1
+    </select>
+
+    <insert id="insertProcess" parameterType="com.ruoyi.system.domain.Process" useGeneratedKeys="true" keyProperty="processId">
+        insert into md_process
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="processNo != null">process_no,</if>
+            <if test="processName != null and processName != ''">process_name,</if>
+            <if test="isQc != null">is_qc,</if>
+            <if test="status != null">status,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="remark != null">remark,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="processNo != null">#{processNo},</if>
+            <if test="processName != null and processName != ''">#{processName},</if>
+            <if test="isQc != null">#{isQc},</if>
+            <if test="status != null">#{status},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="remark != null">#{remark},</if>
+        </trim>
+    </insert>
+
+    <update id="updateProcess" parameterType="com.ruoyi.system.domain.Process">
+        update md_process
+        set process_no = #{processNo},
+            process_name = #{processName},
+            is_qc = #{isQc},
+            status = #{status},
+            remark = #{remark},
+            update_by = #{updateBy},
+            update_time = sysdate()
+        where process_id = #{processId}
+    </update>
+
+    <delete id="deleteProcessByProcessIds" parameterType="String">
+        delete from md_process where process_id in
+        <foreach item="processId" collection="array" open="(" separator="," close=")">
+            #{processId}
+        </foreach>
+    </delete>
+</mapper>

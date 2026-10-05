@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.ToleranceMapper">
+
+    <resultMap type="Tolerance" id="ToleranceResult">
+        <result property="toleranceId"  column="tolerance_id"  />
+        <result property="standard"     column="standard"      />
+        <result property="thicknessMin" column="thickness_min" />
+        <result property="thicknessMax" column="thickness_max" />
+        <result property="widthMin"     column="width_min"     />
+        <result property="widthMax"     column="width_max"     />
+        <result property="devLower"     column="dev_lower"     />
+        <result property="devUpper"     column="dev_upper"     />
+        <result property="status"       column="status"        />
+        <result property="createBy"     column="create_by"     />
+        <result property="createTime"   column="create_time"   />
+        <result property="updateBy"     column="update_by"     />
+        <result property="updateTime"   column="update_time"   />
+        <result property="remark"       column="remark"        />
+    </resultMap>
+
+    <sql id="selectToleranceVo">
+        select tolerance_id, standard, thickness_min, thickness_max, width_min, width_max,
+               dev_lower, dev_upper, status, create_by, create_time, update_by, update_time, remark
+        from md_tolerance
+    </sql>
+
+    <select id="selectToleranceList" parameterType="Tolerance" resultMap="ToleranceResult">
+        <include refid="selectToleranceVo"/>
+        <where>
+            <if test="standard != null  and standard != ''"> and standard = #{standard}</if>
+            <if test="status != null  and status != ''"> and status = #{status}</if>
+        </where>
+        order by standard, thickness_min, width_min
+    </select>
+
+    <select id="selectToleranceByToleranceId" parameterType="Long" resultMap="ToleranceResult">
+        <include refid="selectToleranceVo"/>
+        where tolerance_id = #{toleranceId}
+    </select>
+
+    <insert id="insertTolerance" parameterType="Tolerance" useGeneratedKeys="true" keyProperty="toleranceId">
+        insert into md_tolerance
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="standard != null and standard != ''">standard,</if>
+            <if test="thicknessMin != null">thickness_min,</if>
+            <if test="thicknessMax != null">thickness_max,</if>
+            <if test="widthMin != null">width_min,</if>
+            <if test="widthMax != null">width_max,</if>
+            <if test="devLower != null">dev_lower,</if>
+            <if test="devUpper != null">dev_upper,</if>
+            <if test="status != null">status,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="remark != null">remark,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="standard != null and standard != ''">#{standard},</if>
+            <if test="thicknessMin != null">#{thicknessMin},</if>
+            <if test="thicknessMax != null">#{thicknessMax},</if>
+            <if test="widthMin != null">#{widthMin},</if>
+            <if test="widthMax != null">#{widthMax},</if>
+            <if test="devLower != null">#{devLower},</if>
+            <if test="devUpper != null">#{devUpper},</if>
+            <if test="status != null">#{status},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="remark != null">#{remark},</if>
+        </trim>
+    </insert>
+
+    <update id="updateTolerance" parameterType="Tolerance">
+        update md_tolerance
+        set standard = #{standard},
+            thickness_min = #{thicknessMin},
+            thickness_max = #{thicknessMax},
+            width_min = #{widthMin},
+            width_max = #{widthMax},
+            dev_lower = #{devLower},
+            dev_upper = #{devUpper},
+            status = #{status},
+            remark = #{remark},
+            update_by = #{updateBy},
+            update_time = sysdate()
+        where tolerance_id = #{toleranceId}
+    </update>
+
+    <delete id="deleteToleranceByToleranceIds" parameterType="String">
+        delete from md_tolerance where tolerance_id in
+        <foreach item="toleranceId" collection="array" open="(" separator="," close=")">
+            #{toleranceId}
+        </foreach>
+    </delete>
+</mapper>

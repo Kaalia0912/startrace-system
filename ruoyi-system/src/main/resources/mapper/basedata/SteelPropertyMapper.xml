@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.SteelPropertyMapper">
+
+    <resultMap type="SteelProperty" id="SteelPropertyResult">
+        <result property="propertyId"    column="property_id"    />
+        <result property="steelGrade"    column="steel_grade"    />
+        <result property="state"         column="state"          />
+        <result property="yieldMin"      column="yield_min"      />
+        <result property="tensileMin"    column="tensile_min"    />
+        <result property="elongationMin" column="elongation_min" />
+        <result property="hvMin"         column="hv_min"         />
+        <result property="hvMax"         column="hv_max"         />
+        <result property="status"        column="status"         />
+        <result property="createBy"      column="create_by"      />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateBy"      column="update_by"      />
+        <result property="updateTime"    column="update_time"    />
+        <result property="remark"        column="remark"         />
+    </resultMap>
+
+    <sql id="selectSteelPropertyVo">
+        select property_id, steel_grade, state, yield_min, tensile_min, elongation_min,
+               hv_min, hv_max, status, create_by, create_time, update_by, update_time, remark
+        from md_steel_property
+    </sql>
+
+    <select id="selectSteelPropertyList" parameterType="SteelProperty" resultMap="SteelPropertyResult">
+        <include refid="selectSteelPropertyVo"/>
+        <where>
+            <if test="steelGrade != null  and steelGrade != ''"> and steel_grade like concat('%', #{steelGrade}, '%')</if>
+            <if test="state != null  and state != ''"> and state = #{state}</if>
+            <if test="status != null  and status != ''"> and status = #{status}</if>
+        </where>
+        order by steel_grade, property_id
+    </select>
+
+    <select id="selectSteelPropertyByPropertyId" parameterType="Long" resultMap="SteelPropertyResult">
+        <include refid="selectSteelPropertyVo"/>
+        where property_id = #{propertyId}
+    </select>
+
+    <select id="checkGradeStateUnique" parameterType="SteelProperty" resultMap="SteelPropertyResult">
+        <include refid="selectSteelPropertyVo"/>
+        where steel_grade = #{steelGrade} and state = #{state} limit 1
+    </select>
+
+    <insert id="insertSteelProperty" parameterType="SteelProperty" useGeneratedKeys="true" keyProperty="propertyId">
+        insert into md_steel_property
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="steelGrade != null and steelGrade != ''">steel_grade,</if>
+            <if test="state != null and state != ''">state,</if>
+            <if test="yieldMin != null">yield_min,</if>
+            <if test="tensileMin != null">tensile_min,</if>
+            <if test="elongationMin != null">elongation_min,</if>
+            <if test="hvMin != null">hv_min,</if>
+            <if test="hvMax != null">hv_max,</if>
+            <if test="status != null">status,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="remark != null">remark,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="steelGrade != null and steelGrade != ''">#{steelGrade},</if>
+            <if test="state != null and state != ''">#{state},</if>
+            <if test="yieldMin != null">#{yieldMin},</if>
+            <if test="tensileMin != null">#{tensileMin},</if>
+            <if test="elongationMin != null">#{elongationMin},</if>
+            <if test="hvMin != null">#{hvMin},</if>
+            <if test="hvMax != null">#{hvMax},</if>
+            <if test="status != null">#{status},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="remark != null">#{remark},</if>
+        </trim>
+    </insert>
+
+    <update id="updateSteelProperty" parameterType="SteelProperty">
+        update md_steel_property
+        set steel_grade = #{steelGrade},
+            state = #{state},
+            yield_min = #{yieldMin},
+            tensile_min = #{tensileMin},
+            elongation_min = #{elongationMin},
+            hv_min = #{hvMin},
+            hv_max = #{hvMax},
+            status = #{status},
+            remark = #{remark},
+            update_by = #{updateBy},
+            update_time = sysdate()
+        where property_id = #{propertyId}
+    </update>
+
+    <delete id="deleteSteelPropertyByPropertyIds" parameterType="String">
+        delete from md_steel_property where property_id in
+        <foreach item="propertyId" collection="array" open="(" separator="," close=")">
+            #{propertyId}
+        </foreach>
+    </delete>
+</mapper>
