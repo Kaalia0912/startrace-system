@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.FinReceiptMapper">
+
+    <resultMap type="FinReceipt" id="FinReceiptResult">
+        <result property="receiptId"    column="receipt_id"    />
+        <result property="receiptNo"    column="receipt_no"    />
+        <result property="customerName" column="customer_name" />
+        <result property="orderNo"      column="order_no"      />
+        <result property="receiptDate"  column="receipt_date"  />
+        <result property="amount"       column="amount"        />
+        <result property="payMethod"    column="pay_method"    />
+        <result property="handler"      column="handler"       />
+        <result property="createBy"     column="create_by"     />
+        <result property="createTime"   column="create_time"   />
+        <result property="updateBy"     column="update_by"     />
+        <result property="updateTime"   column="update_time"   />
+        <result property="remark"       column="remark"        />
+    </resultMap>
+
+    <sql id="selectFinReceiptVo">
+        select receipt_id, receipt_no, customer_name, order_no, receipt_date, amount,
+               pay_method, handler, create_by, create_time, update_by, update_time, remark
+        from fin_receipt
+    </sql>
+
+    <select id="selectFinReceiptList" parameterType="FinReceipt" resultMap="FinReceiptResult">
+        <include refid="selectFinReceiptVo"/>
+        <where>
+            <if test="receiptNo != null  and receiptNo != ''"> and receipt_no like concat('%', #{receiptNo}, '%')</if>
+            <if test="customerName != null  and customerName != ''"> and customer_name like concat('%', #{customerName}, '%')</if>
+            <if test="orderNo != null  and orderNo != ''"> and order_no like concat('%', #{orderNo}, '%')</if>
+            <if test="payMethod != null  and payMethod != ''"> and pay_method = #{payMethod}</if>
+        </where>
+        order by receipt_date desc, receipt_id desc
+    </select>
+
+    <select id="selectFinReceiptByReceiptId" parameterType="Long" resultMap="FinReceiptResult">
+        <include refid="selectFinReceiptVo"/>
+        where receipt_id = #{receiptId}
+    </select>
+
+    <select id="checkReceiptNoUnique" parameterType="String" resultMap="FinReceiptResult">
+        <include refid="selectFinReceiptVo"/>
+        where receipt_no = #{receiptNo} limit 1
+    </select>
+
+    <insert id="insertFinReceipt" parameterType="FinReceipt" useGeneratedKeys="true" keyProperty="receiptId">
+        insert into fin_receipt
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="receiptNo != null and receiptNo != ''">receipt_no,</if>
+            <if test="customerName != null">customer_name,</if>
+            <if test="orderNo != null">order_no,</if>
+            <if test="receiptDate != null">receipt_date,</if>
+            <if test="amount != null">amount,</if>
+            <if test="payMethod != null">pay_method,</if>
+            <if test="handler != null">handler,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="remark != null">remark,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="receiptNo != null and receiptNo != ''">#{receiptNo},</if>
+            <if test="customerName != null">#{customerName},</if>
+            <if test="orderNo != null">#{orderNo},</if>
+            <if test="receiptDate != null">#{receiptDate},</if>
+            <if test="amount != null">#{amount},</if>
+            <if test="payMethod != null">#{payMethod},</if>
+            <if test="handler != null">#{handler},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="remark != null">#{remark},</if>
+        </trim>
+    </insert>
+
+    <update id="updateFinReceipt" parameterType="FinReceipt">
+        update fin_receipt
+        set receipt_no = #{receiptNo},
+            customer_name = #{customerName},
+            order_no = #{orderNo},
+            receipt_date = #{receiptDate},
+            amount = #{amount},
+            pay_method = #{payMethod},
+            handler = #{handler},
+            remark = #{remark},
+            update_by = #{updateBy},
+            update_time = sysdate()
+        where receipt_id = #{receiptId}
+    </update>
+
+    <delete id="deleteFinReceiptByReceiptIds" parameterType="String">
+        delete from fin_receipt where receipt_id in
+        <foreach item="receiptId" collection="array" open="(" separator="," close=")">
+            #{receiptId}
+        </foreach>
+    </delete>
+
+    <!-- 应收汇总：按客户汇总订单金额、已收金额、未收金额与账龄 -->
+    <select id="selectReceivableSummary" resultType="java.util.HashMap">
+        select o.customer_name as customerName,
+               ifnull(sum(o.amount), 0) as orderAmount,
+               ifnull(max(r.receipt_amount), 0) as receiptAmount,
+               ifnull(sum(o.amount), 0) - ifnull(max(r.receipt_amount), 0) as unreceivedAmount,
+               date_format(min(o.order_date), '%Y-%m-%d') as earliestOrderDate,
+               datediff(curdate(), min(o.order_date)) as ageDays
+        from ord_sale_order o
+        left join (
+            select customer_name, sum(amount) as receipt_amount
+            from fin_receipt
+            group by customer_name
+        ) r on r.customer_name = o.customer_name
+        where o.customer_name is not null and o.customer_name &lt;&gt; ''
+        group by o.customer_name, r.receipt_amount
+        order by unreceivedAmount desc
+    </select>
+</mapper>

@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.ProfitMapper">
+
+    <select id="selectOrderProfit" resultType="java.util.HashMap">
+        select o.order_no as orderNo,
+               max(o.customer_name) as customerName,
+               round(ifnull(sum(o.amount), 0), 2) as orderAmount,
+               round(ifnull(max(f.finish_weight), 0), 2) as finishWeight,
+               round(ifnull(max(f.material_cost), 0), 2) as materialCost,
+               round(ifnull(max(f.finish_weight), 0) * #{processCost}, 2) as processCost,
+               round(ifnull(sum(o.amount), 0) - ifnull(max(f.material_cost), 0)
+                     - ifnull(max(f.finish_weight), 0) * #{processCost}, 2) as profit,
+               round((ifnull(sum(o.amount), 0) - ifnull(max(f.material_cost), 0)
+                     - ifnull(max(f.finish_weight), 0) * #{processCost}) / nullif(sum(o.amount), 0) * 100, 2) as profitRate
+        from ord_sale_order o
+        left join (
+            select fc.order_no,
+                   sum(fc.net_weight) as finish_weight,
+                   sum(fc.net_weight * ifnull(m.raw_price, 0)) as material_cost
+            from inv_finish_coil fc
+            left join md_material m on m.material_code = fc.material_code
+            group by fc.order_no
+        ) f on f.order_no = o.order_no
+        <where>
+            <if test="orderNo != null  and orderNo != ''"> and o.order_no like concat('%', #{orderNo}, '%')</if>
+            <if test="customerName != null  and customerName != ''"> and o.customer_name like concat('%', #{customerName}, '%')</if>
+        </where>
+        group by o.order_no
+        order by profit desc
+    </select>
+</mapper>
