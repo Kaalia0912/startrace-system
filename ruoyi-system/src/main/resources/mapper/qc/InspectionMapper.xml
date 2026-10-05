@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.InspectionMapper">
+
+    <resultMap type="Inspection" id="InspectionResult">
+        <result property="inspectionId"  column="inspection_id"  />
+        <result property="inspectionNo"  column="inspection_no"  />
+        <result property="source"        column="source"         />
+        <result property="orderNo"       column="order_no"       />
+        <result property="coilNo"        column="coil_no"        />
+        <result property="materialCode"  column="material_code"  />
+        <result property="steelGrade"    column="steel_grade"    />
+        <result property="state"         column="state"          />
+        <result property="standard"      column="standard"       />
+        <result property="thicknessVal"  column="thickness_val"  />
+        <result property="nominalWidth"  column="nominal_width"  />
+        <result property="widthVal"      column="width_val"      />
+        <result property="yieldVal"      column="yield_val"      />
+        <result property="tensileVal"    column="tensile_val"    />
+        <result property="elongationVal" column="elongation_val" />
+        <result property="hvVal"         column="hv_val"         />
+        <result property="surfaceRaVal"  column="surface_ra_val" />
+        <result property="judgeResult"   column="judge_result"   />
+        <result property="judgeDetail"   column="judge_detail"   />
+        <result property="inspector"     column="inspector"      />
+        <result property="inspectDate"   column="inspect_date"   />
+        <result property="createBy"      column="create_by"      />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateBy"      column="update_by"      />
+        <result property="updateTime"    column="update_time"    />
+        <result property="remark"        column="remark"         />
+    </resultMap>
+
+    <sql id="selectInspectionVo">
+        select inspection_id, inspection_no, source, order_no, coil_no, material_code, steel_grade, state,
+               standard, thickness_val, nominal_width, width_val, yield_val, tensile_val, elongation_val,
+               hv_val, surface_ra_val, judge_result, judge_detail, inspector, inspect_date,
+               create_by, create_time, update_by, update_time, remark
+        from qc_inspection
+    </sql>
+
+    <select id="selectInspectionList" parameterType="Inspection" resultMap="InspectionResult">
+        <include refid="selectInspectionVo"/>
+        <where>
+            <if test="inspectionNo != null  and inspectionNo != ''"> and inspection_no like concat('%', #{inspectionNo}, '%')</if>
+            <if test="coilNo != null  and coilNo != ''"> and coil_no like concat('%', #{coilNo}, '%')</if>
+            <if test="orderNo != null  and orderNo != ''"> and order_no like concat('%', #{orderNo}, '%')</if>
+            <if test="steelGrade != null  and steelGrade != ''"> and steel_grade like concat('%', #{steelGrade}, '%')</if>
+            <if test="source != null  and source != ''"> and source = #{source}</if>
+            <if test="judgeResult != null  and judgeResult != ''"> and judge_result = #{judgeResult}</if>
+        </where>
+        order by inspection_id desc
+    </select>
+
+    <select id="selectInspectionByInspectionId" parameterType="Long" resultMap="InspectionResult">
+        <include refid="selectInspectionVo"/>
+        where inspection_id = #{inspectionId}
+    </select>
+
+    <select id="checkInspectionNoUnique" parameterType="String" resultMap="InspectionResult">
+        <include refid="selectInspectionVo"/>
+        where inspection_no = #{inspectionNo} limit 1
+    </select>
+
+    <insert id="insertInspection" parameterType="Inspection" useGeneratedKeys="true" keyProperty="inspectionId">
+        insert into qc_inspection
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="inspectionNo != null and inspectionNo != ''">inspection_no,</if>
+            <if test="source != null">source,</if>
+            <if test="orderNo != null">order_no,</if>
+            <if test="coilNo != null">coil_no,</if>
+            <if test="materialCode != null">material_code,</if>
+            <if test="steelGrade != null">steel_grade,</if>
+            <if test="state != null">state,</if>
+            <if test="standard != null">standard,</if>
+            <if test="thicknessVal != null">thickness_val,</if>
+            <if test="nominalWidth != null">nominal_width,</if>
+            <if test="widthVal != null">width_val,</if>
+            <if test="yieldVal != null">yield_val,</if>
+            <if test="tensileVal != null">tensile_val,</if>
+            <if test="elongationVal != null">elongation_val,</if>
+            <if test="hvVal != null">hv_val,</if>
+            <if test="surfaceRaVal != null">surface_ra_val,</if>
+            <if test="judgeResult != null">judge_result,</if>
+            <if test="judgeDetail != null">judge_detail,</if>
+            <if test="inspector != null">inspector,</if>
+            <if test="inspectDate != null">inspect_date,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="remark != null">remark,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="inspectionNo != null and inspectionNo != ''">#{inspectionNo},</if>
+            <if test="source != null">#{source},</if>
+            <if test="orderNo != null">#{orderNo},</if>
+            <if test="coilNo != null">#{coilNo},</if>
+            <if test="materialCode != null">#{materialCode},</if>
+            <if test="steelGrade != null">#{steelGrade},</if>
+            <if test="state != null">#{state},</if>
+            <if test="standard != null">#{standard},</if>
+            <if test="thicknessVal != null">#{thicknessVal},</if>
+            <if test="nominalWidth != null">#{nominalWidth},</if>
+            <if test="widthVal != null">#{widthVal},</if>
+            <if test="yieldVal != null">#{yieldVal},</if>
+            <if test="tensileVal != null">#{tensileVal},</if>
+            <if test="elongationVal != null">#{elongationVal},</if>
+            <if test="hvVal != null">#{hvVal},</if>
+            <if test="surfaceRaVal != null">#{surfaceRaVal},</if>
+            <if test="judgeResult != null">#{judgeResult},</if>
+            <if test="judgeDetail != null">#{judgeDetail},</if>
+            <if test="inspector != null">#{inspector},</if>
+            <if test="inspectDate != null">#{inspectDate},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="remark != null">#{remark},</if>
+        </trim>
+    </insert>
+
+    <update id="updateInspection" parameterType="Inspection">
+        update qc_inspection
+        set inspection_no = #{inspectionNo},
+            source = #{source},
+            order_no = #{orderNo},
+            coil_no = #{coilNo},
+            material_code = #{materialCode},
+            steel_grade = #{steelGrade},
+            state = #{state},
+            standard = #{standard},
+            thickness_val = #{thicknessVal},
+            nominal_width = #{nominalWidth},
+            width_val = #{widthVal},
+            yield_val = #{yieldVal},
+            tensile_val = #{tensileVal},
+            elongation_val = #{elongationVal},
+            hv_val = #{hvVal},
+            surface_ra_val = #{surfaceRaVal},
+            judge_result = #{judgeResult},
+            judge_detail = #{judgeDetail},
+            inspector = #{inspector},
+            inspect_date = #{inspectDate},
+            remark = #{remark},
+            update_by = #{updateBy},
+            update_time = sysdate()
+        where inspection_id = #{inspectionId}
+    </update>
+
+    <delete id="deleteInspectionByInspectionIds" parameterType="String">
+        delete from qc_inspection where inspection_id in
+        <foreach item="inspectionId" collection="array" open="(" separator="," close=")">
+            #{inspectionId}
+        </foreach>
+    </delete>
+</mapper>
