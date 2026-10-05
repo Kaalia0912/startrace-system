@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- 卷号追溯：只读查询，用驼峰别名直接映射到实体（本项目未开启 mapUnderscoreToCamelCase） -->
+<mapper namespace="com.ruoyi.system.mapper.TraceMapper">
+
+    <select id="selectFinishCoilByCoilNo" parameterType="String" resultType="FinishCoil">
+        select coil_id as coilId, coil_no as coilNo, label_no as labelNo, order_no as orderNo,
+               customer_name as customerName, material_code as materialCode, product_name as productName,
+               material, spec, hardness, surface_ra as surfaceRa, net_weight as netWeight, pieces,
+               produce_date as produceDate, checker, location, in_date as inDate,
+               coil_status as coilStatus, remark
+        from inv_finish_coil
+        where coil_no = #{coilNo}
+        limit 1
+    </select>
+
+    <select id="selectSaleOrderByOrderNo" parameterType="String" resultType="SaleOrder">
+        select order_id as orderId, order_no as orderNo, order_date as orderDate,
+               customer_name as customerName, contact_person as contactPerson, contact_phone as contactPhone,
+               contact_address as contactAddress, material_code as materialCode, product_name as productName,
+               material, spec, hardness, tensile_strength as tensileStrength, unit, quantity,
+               unit_price as unitPrice, amount, delivery_date as deliveryDate, remark
+        from ord_sale_order
+        where order_no = #{orderNo}
+        order by order_id
+    </select>
+
+    <select id="selectProcessRecordByOrderNo" parameterType="String" resultType="ProcessRecord">
+        select r.record_id as recordId, r.work_order_id as workOrderId, r.work_order_no as workOrderNo,
+               r.process_no as processNo, r.process_name as processName, r.machine as machine,
+               r.operator as operator, r.start_time as startTime, r.end_time as endTime,
+               r.input_weight as inputWeight, r.output_weight as outputWeight, r.loss_weight as lossWeight,
+               r.remark as remark
+        from prod_process_record r
+        left join prod_work_order w on w.work_order_no = r.work_order_no
+        where w.order_no = #{orderNo}
+        order by r.work_order_no, r.process_no
+    </select>
+
+    <select id="selectInspectionByCoilNo" parameterType="String" resultType="Inspection">
+        select inspection_id as inspectionId, inspection_no as inspectionNo, source, order_no as orderNo,
+               coil_no as coilNo, material_code as materialCode, steel_grade as steelGrade, state, standard,
+               thickness_val as thicknessVal, nominal_width as nominalWidth, width_val as widthVal,
+               yield_val as yieldVal, tensile_val as tensileVal, elongation_val as elongationVal,
+               hv_val as hvVal, surface_ra_val as surfaceRaVal, judge_result as judgeResult,
+               judge_detail as judgeDetail, inspector, inspect_date as inspectDate, remark
+        from qc_inspection
+        where coil_no = #{coilNo}
+        order by inspection_id
+    </select>
+
+    <select id="selectShipmentByCoilNo" parameterType="String" resultType="Shipment">
+        select s.shipment_id as shipmentId, s.shipment_no as shipmentNo, s.customer_name as customerName,
+               s.order_no as orderNo, s.address as address, s.receiver as receiver, s.phone as phone,
+               s.shipment_date as shipmentDate, s.total_weight as totalWeight, s.total_pieces as totalPieces,
+               s.status as status, s.remark as remark
+        from inv_shipment s
+        inner join inv_shipment_item i on i.shipment_id = s.shipment_id
+        where i.coil_no = #{coilNo}
+        order by s.shipment_id
+    </select>
+</mapper>
