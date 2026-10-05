@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.EquipLedgerMapper">
+
+    <resultMap type="EquipLedger" id="EquipLedgerResult">
+        <result property="equipId"        column="equip_id"        />
+        <result property="equipCode"      column="equip_code"      />
+        <result property="equipName"      column="equip_name"      />
+        <result property="equipType"      column="equip_type"      />
+        <result property="model"          column="model"           />
+        <result property="location"       column="location"        />
+        <result property="buyDate"        column="buy_date"        />
+        <result property="checkCycleDays" column="check_cycle_days" />
+        <result property="lastCheckDate"  column="last_check_date" />
+        <result property="status"         column="status"          />
+        <result property="createBy"       column="create_by"       />
+        <result property="createTime"     column="create_time"     />
+        <result property="updateBy"       column="update_by"       />
+        <result property="updateTime"     column="update_time"     />
+        <result property="remark"         column="remark"          />
+    </resultMap>
+
+    <sql id="selectEquipLedgerVo">
+        select equip_id, equip_code, equip_name, equip_type, model, location, buy_date,
+               check_cycle_days, last_check_date, status,
+               create_by, create_time, update_by, update_time, remark
+        from equip_ledger
+    </sql>
+
+    <select id="selectEquipLedgerList" parameterType="EquipLedger" resultMap="EquipLedgerResult">
+        <include refid="selectEquipLedgerVo"/>
+        <where>
+            <if test="equipCode != null  and equipCode != ''"> and equip_code like concat('%', #{equipCode}, '%')</if>
+            <if test="equipName != null  and equipName != ''"> and equip_name like concat('%', #{equipName}, '%')</if>
+            <if test="equipType != null  and equipType != ''"> and equip_type = #{equipType}</if>
+            <if test="location != null  and location != ''"> and location like concat('%', #{location}, '%')</if>
+            <if test="status != null  and status != ''"> and status = #{status}</if>
+        </where>
+        order by equip_code
+    </select>
+
+    <select id="selectEquipLedgerByEquipId" parameterType="Long" resultMap="EquipLedgerResult">
+        <include refid="selectEquipLedgerVo"/>
+        where equip_id = #{equipId}
+    </select>
+
+    <select id="checkEquipCodeUnique" parameterType="String" resultMap="EquipLedgerResult">
+        <include refid="selectEquipLedgerVo"/>
+        where equip_code = #{equipCode} limit 1
+    </select>
+
+    <insert id="insertEquipLedger" parameterType="EquipLedger" useGeneratedKeys="true" keyProperty="equipId">
+        insert into equip_ledger
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="equipCode != null and equipCode != ''">equip_code,</if>
+            <if test="equipName != null">equip_name,</if>
+            <if test="equipType != null">equip_type,</if>
+            <if test="model != null">model,</if>
+            <if test="location != null">location,</if>
+            <if test="buyDate != null">buy_date,</if>
+            <if test="checkCycleDays != null">check_cycle_days,</if>
+            <if test="lastCheckDate != null">last_check_date,</if>
+            <if test="status != null">status,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="remark != null">remark,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="equipCode != null and equipCode != ''">#{equipCode},</if>
+            <if test="equipName != null">#{equipName},</if>
+            <if test="equipType != null">#{equipType},</if>
+            <if test="model != null">#{model},</if>
+            <if test="location != null">#{location},</if>
+            <if test="buyDate != null">#{buyDate},</if>
+            <if test="checkCycleDays != null">#{checkCycleDays},</if>
+            <if test="lastCheckDate != null">#{lastCheckDate},</if>
+            <if test="status != null">#{status},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="remark != null">#{remark},</if>
+        </trim>
+    </insert>
+
+    <update id="updateEquipLedger" parameterType="EquipLedger">
+        update equip_ledger
+        set equip_code = #{equipCode},
+            equip_name = #{equipName},
+            equip_type = #{equipType},
+            model = #{model},
+            location = #{location},
+            buy_date = #{buyDate},
+            check_cycle_days = #{checkCycleDays},
+            last_check_date = #{lastCheckDate},
+            status = #{status},
+            remark = #{remark},
+            update_by = #{updateBy},
+            update_time = sysdate()
+        where equip_id = #{equipId}
+    </update>
+
+    <delete id="deleteEquipLedgerByEquipIds" parameterType="String">
+        delete from equip_ledger where equip_id in
+        <foreach item="equipId" collection="array" open="(" separator="," close=")">
+            #{equipId}
+        </foreach>
+    </delete>
+</mapper>

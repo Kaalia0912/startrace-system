@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.ProcessRecordMapper">
+
+    <resultMap type="ProcessRecord" id="ProcessRecordResult">
+        <result property="recordId"     column="record_id"     />
+        <result property="workOrderId"  column="work_order_id" />
+        <result property="workOrderNo"  column="work_order_no" />
+        <result property="processNo"    column="process_no"    />
+        <result property="processName"  column="process_name"  />
+        <result property="machine"      column="machine"       />
+        <result property="operator"     column="operator"      />
+        <result property="startTime"    column="start_time"    />
+        <result property="endTime"      column="end_time"      />
+        <result property="inputWeight"  column="input_weight"  />
+        <result property="outputWeight" column="output_weight" />
+        <result property="lossWeight"   column="loss_weight"   />
+        <result property="createBy"     column="create_by"     />
+        <result property="createTime"   column="create_time"   />
+        <result property="updateBy"     column="update_by"     />
+        <result property="updateTime"   column="update_time"   />
+        <result property="remark"       column="remark"        />
+    </resultMap>
+
+    <sql id="selectProcessRecordVo">
+        select record_id, work_order_id, work_order_no, process_no, process_name, machine, operator,
+               start_time, end_time, input_weight, output_weight, loss_weight,
+               create_by, create_time, update_by, update_time, remark
+        from prod_process_record
+    </sql>
+
+    <select id="selectProcessRecordList" parameterType="ProcessRecord" resultMap="ProcessRecordResult">
+        <include refid="selectProcessRecordVo"/>
+        <where>
+            <if test="workOrderNo != null  and workOrderNo != ''"> and work_order_no like concat('%', #{workOrderNo}, '%')</if>
+            <if test="processNo != null"> and process_no = #{processNo}</if>
+            <if test="processName != null  and processName != ''"> and process_name like concat('%', #{processName}, '%')</if>
+            <if test="operator != null  and operator != ''"> and operator like concat('%', #{operator}, '%')</if>
+        </where>
+        order by work_order_no, process_no
+    </select>
+
+    <select id="selectProcessRecordByRecordId" parameterType="Long" resultMap="ProcessRecordResult">
+        <include refid="selectProcessRecordVo"/>
+        where record_id = #{recordId}
+    </select>
+
+    <insert id="insertProcessRecord" parameterType="ProcessRecord" useGeneratedKeys="true" keyProperty="recordId">
+        insert into prod_process_record
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="workOrderId != null">work_order_id,</if>
+            <if test="workOrderNo != null">work_order_no,</if>
+            <if test="processNo != null">process_no,</if>
+            <if test="processName != null">process_name,</if>
+            <if test="machine != null">machine,</if>
+            <if test="operator != null">operator,</if>
+            <if test="startTime != null">start_time,</if>
+            <if test="endTime != null">end_time,</if>
+            <if test="inputWeight != null">input_weight,</if>
+            <if test="outputWeight != null">output_weight,</if>
+            <if test="lossWeight != null">loss_weight,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="remark != null">remark,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="workOrderId != null">#{workOrderId},</if>
+            <if test="workOrderNo != null">#{workOrderNo},</if>
+            <if test="processNo != null">#{processNo},</if>
+            <if test="processName != null">#{processName},</if>
+            <if test="machine != null">#{machine},</if>
+            <if test="operator != null">#{operator},</if>
+            <if test="startTime != null">#{startTime},</if>
+            <if test="endTime != null">#{endTime},</if>
+            <if test="inputWeight != null">#{inputWeight},</if>
+            <if test="outputWeight != null">#{outputWeight},</if>
+            <if test="lossWeight != null">#{lossWeight},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="remark != null">#{remark},</if>
+        </trim>
+    </insert>
+
+    <update id="updateProcessRecord" parameterType="ProcessRecord">
+        update prod_process_record
+        set work_order_id = #{workOrderId},
+            work_order_no = #{workOrderNo},
+            process_no = #{processNo},
+            process_name = #{processName},
+            machine = #{machine},
+            operator = #{operator},
+            start_time = #{startTime},
+            end_time = #{endTime},
+            input_weight = #{inputWeight},
+            output_weight = #{outputWeight},
+            loss_weight = #{lossWeight},
+            remark = #{remark},
+            update_by = #{updateBy},
+            update_time = sysdate()
+        where record_id = #{recordId}
+    </update>
+
+    <delete id="deleteProcessRecordByRecordIds" parameterType="String">
+        delete from prod_process_record where record_id in
+        <foreach item="recordId" collection="array" open="(" separator="," close=")">
+            #{recordId}
+        </foreach>
+    </delete>
+</mapper>

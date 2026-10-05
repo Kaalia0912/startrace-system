@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.WorkOrderMapper">
+
+    <resultMap type="WorkOrder" id="WorkOrderResult">
+        <result property="workOrderId"   column="work_order_id"   />
+        <result property="workOrderNo"   column="work_order_no"   />
+        <result property="orderNo"       column="order_no"        />
+        <result property="materialCode"  column="material_code"   />
+        <result property="productName"   column="product_name"    />
+        <result property="spec"          column="spec"            />
+        <result property="quantity"      column="quantity"        />
+        <result property="planStartDate" column="plan_start_date" />
+        <result property="planEndDate"   column="plan_end_date"   />
+        <result property="status"        column="status"          />
+        <result property="createBy"      column="create_by"       />
+        <result property="createTime"    column="create_time"     />
+        <result property="updateBy"      column="update_by"       />
+        <result property="updateTime"    column="update_time"     />
+        <result property="remark"        column="remark"          />
+    </resultMap>
+
+    <sql id="selectWorkOrderVo">
+        select work_order_id, work_order_no, order_no, material_code, product_name, spec, quantity,
+               plan_start_date, plan_end_date, status,
+               create_by, create_time, update_by, update_time, remark
+        from prod_work_order
+    </sql>
+
+    <select id="selectWorkOrderList" parameterType="WorkOrder" resultMap="WorkOrderResult">
+        <include refid="selectWorkOrderVo"/>
+        <where>
+            <if test="workOrderNo != null  and workOrderNo != ''"> and work_order_no like concat('%', #{workOrderNo}, '%')</if>
+            <if test="orderNo != null  and orderNo != ''"> and order_no like concat('%', #{orderNo}, '%')</if>
+            <if test="materialCode != null  and materialCode != ''"> and material_code like concat('%', #{materialCode}, '%')</if>
+            <if test="productName != null  and productName != ''"> and product_name like concat('%', #{productName}, '%')</if>
+            <if test="status != null  and status != ''"> and status = #{status}</if>
+        </where>
+        order by work_order_id desc
+    </select>
+
+    <select id="selectWorkOrderByWorkOrderId" parameterType="Long" resultMap="WorkOrderResult">
+        <include refid="selectWorkOrderVo"/>
+        where work_order_id = #{workOrderId}
+    </select>
+
+    <select id="checkWorkOrderNoUnique" parameterType="String" resultMap="WorkOrderResult">
+        <include refid="selectWorkOrderVo"/>
+        where work_order_no = #{workOrderNo} limit 1
+    </select>
+
+    <insert id="insertWorkOrder" parameterType="WorkOrder" useGeneratedKeys="true" keyProperty="workOrderId">
+        insert into prod_work_order
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="workOrderNo != null and workOrderNo != ''">work_order_no,</if>
+            <if test="orderNo != null">order_no,</if>
+            <if test="materialCode != null">material_code,</if>
+            <if test="productName != null">product_name,</if>
+            <if test="spec != null">spec,</if>
+            <if test="quantity != null">quantity,</if>
+            <if test="planStartDate != null">plan_start_date,</if>
+            <if test="planEndDate != null">plan_end_date,</if>
+            <if test="status != null">status,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="remark != null">remark,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="workOrderNo != null and workOrderNo != ''">#{workOrderNo},</if>
+            <if test="orderNo != null">#{orderNo},</if>
+            <if test="materialCode != null">#{materialCode},</if>
+            <if test="productName != null">#{productName},</if>
+            <if test="spec != null">#{spec},</if>
+            <if test="quantity != null">#{quantity},</if>
+            <if test="planStartDate != null">#{planStartDate},</if>
+            <if test="planEndDate != null">#{planEndDate},</if>
+            <if test="status != null">#{status},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="remark != null">#{remark},</if>
+        </trim>
+    </insert>
+
+    <update id="updateWorkOrder" parameterType="WorkOrder">
+        update prod_work_order
+        set work_order_no = #{workOrderNo},
+            order_no = #{orderNo},
+            material_code = #{materialCode},
+            product_name = #{productName},
+            spec = #{spec},
+            quantity = #{quantity},
+            plan_start_date = #{planStartDate},
+            plan_end_date = #{planEndDate},
+            status = #{status},
+            remark = #{remark},
+            update_by = #{updateBy},
+            update_time = sysdate()
+        where work_order_id = #{workOrderId}
+    </update>
+
+    <delete id="deleteWorkOrderByWorkOrderIds" parameterType="String">
+        delete from prod_work_order where work_order_id in
+        <foreach item="workOrderId" collection="array" open="(" separator="," close=")">
+            #{workOrderId}
+        </foreach>
+    </delete>
+</mapper>
