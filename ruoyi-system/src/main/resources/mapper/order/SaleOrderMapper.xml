@@ -1,0 +1,190 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.SaleOrderMapper">
+
+    <resultMap type="SaleOrder" id="SaleOrderResult">
+        <result property="orderId"         column="order_id"         />
+        <result property="orderNo"         column="order_no"         />
+        <result property="orderDate"       column="order_date"       />
+        <result property="customerName"    column="customer_name"    />
+        <result property="contactPerson"   column="contact_person"   />
+        <result property="contactPhone"    column="contact_phone"    />
+        <result property="contactAddress"  column="contact_address"  />
+        <result property="materialCode"    column="material_code"    />
+        <result property="productName"     column="product_name"     />
+        <result property="material"        column="material"         />
+        <result property="spec"            column="spec"             />
+        <result property="hardness"        column="hardness"         />
+        <result property="tensileStrength" column="tensile_strength" />
+        <result property="unit"            column="unit"             />
+        <result property="quantity"        column="quantity"         />
+        <result property="unitPrice"       column="unit_price"       />
+        <result property="amount"          column="amount"           />
+        <result property="deliveryDate"    column="delivery_date"    />
+        <result property="createBy"        column="create_by"        />
+        <result property="createTime"      column="create_time"      />
+        <result property="updateBy"        column="update_by"        />
+        <result property="updateTime"      column="update_time"      />
+        <result property="remark"          column="remark"           />
+    </resultMap>
+
+    <sql id="selectSaleOrderVo">
+        select order_id, order_no, order_date, customer_name, contact_person, contact_phone,
+               contact_address, material_code, product_name, material, spec, hardness,
+               tensile_strength, unit, quantity, unit_price, amount, delivery_date,
+               create_by, create_time, update_by, update_time, remark
+        from ord_sale_order
+    </sql>
+
+    <select id="selectSaleOrderList" parameterType="SaleOrder" resultMap="SaleOrderResult">
+        <include refid="selectSaleOrderVo"/>
+        <where>
+            <if test="orderNo != null  and orderNo != ''"> and order_no like concat('%', #{orderNo}, '%')</if>
+            <if test="customerName != null  and customerName != ''"> and customer_name like concat('%', #{customerName}, '%')</if>
+            <if test="productName != null  and productName != ''"> and product_name like concat('%', #{productName}, '%')</if>
+            <if test="materialCode != null  and materialCode != ''"> and material_code like concat('%', #{materialCode}, '%')</if>
+            <if test="orderDate != null"> and order_date = #{orderDate}</if>
+        </where>
+        order by order_date desc, order_id desc
+    </select>
+
+    <select id="selectSaleOrderByOrderId" parameterType="Long" resultMap="SaleOrderResult">
+        <include refid="selectSaleOrderVo"/>
+        where order_id = #{orderId}
+    </select>
+
+    <select id="selectSaleOrderByOrderNo" parameterType="String" resultMap="SaleOrderResult">
+        <include refid="selectSaleOrderVo"/>
+        where order_no = #{orderNo}
+        order by order_id
+    </select>
+
+    <!-- 订单执行进度：订单 → 工单 → 成品入库 → 发货 -->
+    <select id="selectOrderProgress" parameterType="SaleOrder" resultType="java.util.HashMap">
+        select o.order_no as orderNo,
+               date_format(max(o.order_date), '%Y-%m-%d') as orderDate,
+               max(o.customer_name) as customerName,
+               count(*) as lineCount,
+               sum(o.quantity) as quantity,
+               sum(o.amount) as amount,
+               date_format(max(o.delivery_date), '%Y-%m-%d') as deliveryDate,
+               ifnull(max(w.wo_count), 0) as workOrderCount,
+               ifnull(max(w.planned_qty), 0) as plannedQty,
+               ifnull(max(f.coil_count), 0) as finishCoilCount,
+               ifnull(max(f.finish_weight), 0) as finishWeight,
+               ifnull(max(s.ship_count), 0) as shipmentCount,
+               ifnull(max(s.ship_weight), 0) as shipWeight
+        from ord_sale_order o
+        left join (
+            select order_no, count(*) as wo_count, sum(quantity) as planned_qty
+            from prod_work_order group by order_no
+        ) w on w.order_no = o.order_no
+        left join (
+            select order_no, count(*) as coil_count, sum(net_weight) as finish_weight
+            from inv_finish_coil group by order_no
+        ) f on f.order_no = o.order_no
+        left join (
+            select s1.order_no, count(distinct s1.shipment_id) as ship_count, sum(i.net_weight) as ship_weight
+            from inv_shipment s1
+            inner join inv_shipment_item i on i.shipment_id = s1.shipment_id
+            group by s1.order_no
+        ) s on s.order_no = o.order_no
+        <where>
+            <if test="orderNo != null  and orderNo != ''"> and o.order_no like concat('%', #{orderNo}, '%')</if>
+            <if test="customerName != null  and customerName != ''"> and o.customer_name like concat('%', #{customerName}, '%')</if>
+            <if test="productName != null  and productName != ''"> and o.product_name like concat('%', #{productName}, '%')</if>
+        </where>
+        group by o.order_no
+        order by orderDate desc
+    </select>
+
+    <insert id="insertSaleOrder" parameterType="SaleOrder" useGeneratedKeys="true" keyProperty="orderId">
+        insert into ord_sale_order
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="orderNo != null">order_no,</if>
+            <if test="orderDate != null">order_date,</if>
+            <if test="customerName != null">customer_name,</if>
+            <if test="contactPerson != null">contact_person,</if>
+            <if test="contactPhone != null">contact_phone,</if>
+            <if test="contactAddress != null">contact_address,</if>
+            <if test="materialCode != null">material_code,</if>
+            <if test="productName != null">product_name,</if>
+            <if test="material != null">material,</if>
+            <if test="spec != null">spec,</if>
+            <if test="hardness != null">hardness,</if>
+            <if test="tensileStrength != null">tensile_strength,</if>
+            <if test="unit != null">unit,</if>
+            <if test="quantity != null">quantity,</if>
+            <if test="unitPrice != null">unit_price,</if>
+            <if test="amount != null">amount,</if>
+            <if test="deliveryDate != null">delivery_date,</if>
+            <if test="remark != null">remark,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateBy != null">update_by,</if>
+            <if test="updateTime != null">update_time,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="orderNo != null">#{orderNo},</if>
+            <if test="orderDate != null">#{orderDate},</if>
+            <if test="customerName != null">#{customerName},</if>
+            <if test="contactPerson != null">#{contactPerson},</if>
+            <if test="contactPhone != null">#{contactPhone},</if>
+            <if test="contactAddress != null">#{contactAddress},</if>
+            <if test="materialCode != null">#{materialCode},</if>
+            <if test="productName != null">#{productName},</if>
+            <if test="material != null">#{material},</if>
+            <if test="spec != null">#{spec},</if>
+            <if test="hardness != null">#{hardness},</if>
+            <if test="tensileStrength != null">#{tensileStrength},</if>
+            <if test="unit != null">#{unit},</if>
+            <if test="quantity != null">#{quantity},</if>
+            <if test="unitPrice != null">#{unitPrice},</if>
+            <if test="amount != null">#{amount},</if>
+            <if test="deliveryDate != null">#{deliveryDate},</if>
+            <if test="remark != null">#{remark},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateBy != null">#{updateBy},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+        </trim>
+    </insert>
+
+    <update id="updateSaleOrder" parameterType="SaleOrder">
+        update ord_sale_order
+        set order_no = #{orderNo},
+            order_date = #{orderDate},
+            customer_name = #{customerName},
+            contact_person = #{contactPerson},
+            contact_phone = #{contactPhone},
+            contact_address = #{contactAddress},
+            material_code = #{materialCode},
+            product_name = #{productName},
+            material = #{material},
+            spec = #{spec},
+            hardness = #{hardness},
+            tensile_strength = #{tensileStrength},
+            unit = #{unit},
+            quantity = #{quantity},
+            unit_price = #{unitPrice},
+            amount = #{amount},
+            delivery_date = #{deliveryDate},
+            remark = #{remark},
+            update_by = #{updateBy},
+            update_time = sysdate()
+        where order_id = #{orderId}
+    </update>
+
+    <delete id="deleteSaleOrderByOrderId" parameterType="Long">
+        delete from ord_sale_order where order_id = #{orderId}
+    </delete>
+
+    <delete id="deleteSaleOrderByOrderIds" parameterType="String">
+        delete from ord_sale_order where order_id in
+        <foreach item="orderId" collection="array" open="(" separator="," close=")">
+            #{orderId}
+        </foreach>
+    </delete>
+</mapper>
