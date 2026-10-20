@@ -43,11 +43,11 @@
     <el-table v-loading="loading" :data="rawCoilList" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" align="center" />
       <el-table-column label="卷号" align="center" prop="coilNo" min-width="160" :show-overflow-tooltip="true" />
-      <el-table-column label="供应商" align="center" prop="supplier" min-width="140" :show-overflow-tooltip="true" />
       <el-table-column label="材质" align="center" prop="material" width="90" />
       <el-table-column label="规格" align="center" prop="spec" width="110" />
       <el-table-column label="净重(kg)" align="center" prop="netWeight" width="100" />
-      <el-table-column label="炉批号" align="center" prop="heatNo" width="120" />
+      <el-table-column label="硬度(HV)" align="center" prop="hardness" width="100" />
+      <el-table-column label="供应商" align="center" prop="supplier" min-width="140" :show-overflow-tooltip="true" />
       <el-table-column label="库位" align="center" prop="location" width="90" />
       <el-table-column label="检验状态" align="center" prop="qcStatus" width="100">
         <template slot-scope="scope">
@@ -118,8 +118,8 @@
             </el-form-item>
           </el-col>
           <el-col :span="12">
-            <el-form-item label="炉批号" prop="heatNo">
-              <el-input v-model="form.heatNo" placeholder="请输入炉批号" />
+            <el-form-item label="硬度(HV)" prop="hardness">
+              <el-input v-model="form.hardness" placeholder="如 250~310" />
             </el-form-item>
           </el-col>
           <el-col :span="12">
@@ -221,7 +221,7 @@ export default {
         width: null,
         netWeight: null,
         innerDia: null,
-        heatNo: null,
+        hardness: null,
         arriveDate: null,
         location: null,
         qcStatus: "0",

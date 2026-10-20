@@ -1,5 +1,6 @@
 package com.ruoyi.system.controller;
 
+import java.util.Date;
 import java.util.List;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -61,6 +62,7 @@ public class InspectionController extends BaseController
     public AjaxResult add(@RequestBody Inspection inspection)
     {
         inspection.setCreateBy(getUsername());
+        inspection.setCreateTime(new Date());
         return toAjax(inspectionService.insertInspection(inspection));
     }
 

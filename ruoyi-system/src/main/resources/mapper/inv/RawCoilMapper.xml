@@ -13,8 +13,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="thickness"  column="thickness"   />
         <result property="width"      column="width"       />
         <result property="netWeight"  column="net_weight"  />
+        <result property="hardness"   column="hardness"    />
         <result property="innerDia"   column="inner_dia"   />
-        <result property="heatNo"     column="heat_no"     />
         <result property="arriveDate" column="arrive_date" />
         <result property="location"   column="location"    />
         <result property="qcStatus"   column="qc_status"   />
@@ -27,8 +27,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </resultMap>
 
     <sql id="selectRawCoilVo">
-        select coil_id, coil_no, supplier, material, spec, thickness, width, net_weight,
-               inner_dia, heat_no, arrive_date, location, qc_status, coil_status,
+        select coil_id, coil_no, supplier, material, spec, thickness, width, net_weight, hardness,
+               inner_dia, arrive_date, location, qc_status, coil_status,
                create_by, create_time, update_by, update_time, remark
         from inv_raw_coil
     </sql>
@@ -39,7 +39,6 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="coilNo != null  and coilNo != ''"> and coil_no like concat('%', #{coilNo}, '%')</if>
             <if test="supplier != null  and supplier != ''"> and supplier like concat('%', #{supplier}, '%')</if>
             <if test="material != null  and material != ''"> and material like concat('%', #{material}, '%')</if>
-            <if test="heatNo != null  and heatNo != ''"> and heat_no like concat('%', #{heatNo}, '%')</if>
             <if test="qcStatus != null  and qcStatus != ''"> and qc_status = #{qcStatus}</if>
             <if test="coilStatus != null  and coilStatus != ''"> and coil_status = #{coilStatus}</if>
         </where>
@@ -66,8 +65,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="thickness != null">thickness,</if>
             <if test="width != null">width,</if>
             <if test="netWeight != null">net_weight,</if>
+            <if test="hardness != null">hardness,</if>
             <if test="innerDia != null">inner_dia,</if>
-            <if test="heatNo != null">heat_no,</if>
             <if test="arriveDate != null">arrive_date,</if>
             <if test="location != null">location,</if>
             <if test="qcStatus != null">qc_status,</if>
@@ -84,8 +83,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="thickness != null">#{thickness},</if>
             <if test="width != null">#{width},</if>
             <if test="netWeight != null">#{netWeight},</if>
+            <if test="hardness != null">#{hardness},</if>
             <if test="innerDia != null">#{innerDia},</if>
-            <if test="heatNo != null">#{heatNo},</if>
             <if test="arriveDate != null">#{arriveDate},</if>
             <if test="location != null">#{location},</if>
             <if test="qcStatus != null">#{qcStatus},</if>
@@ -105,8 +104,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             thickness = #{thickness},
             width = #{width},
             net_weight = #{netWeight},
+            hardness = #{hardness},
             inner_dia = #{innerDia},
-            heat_no = #{heatNo},
             arrive_date = #{arriveDate},
             location = #{location},
             qc_status = #{qcStatus},

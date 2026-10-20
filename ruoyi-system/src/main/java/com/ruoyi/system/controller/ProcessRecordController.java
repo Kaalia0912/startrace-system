@@ -1,5 +1,6 @@
 package com.ruoyi.system.controller;
 
+import java.util.Date;
 import java.util.List;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -61,6 +62,7 @@ public class ProcessRecordController extends BaseController
     public AjaxResult add(@RequestBody ProcessRecord processRecord)
     {
         processRecord.setCreateBy(getUsername());
+        processRecord.setCreateTime(new Date());
         return toAjax(processRecordService.insertProcessRecord(processRecord));
     }
 

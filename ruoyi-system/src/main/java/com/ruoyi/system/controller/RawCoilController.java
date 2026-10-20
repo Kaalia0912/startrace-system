@@ -1,5 +1,6 @@
 package com.ruoyi.system.controller;
 
+import java.util.Date;
 import java.util.List;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -77,6 +78,7 @@ public class RawCoilController extends BaseController
     public AjaxResult add(@RequestBody RawCoil rawCoil)
     {
         rawCoil.setCreateBy(getUsername());
+        rawCoil.setCreateTime(new Date());
         return toAjax(rawCoilService.insertRawCoil(rawCoil));
     }
 

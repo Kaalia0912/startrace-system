@@ -46,13 +46,13 @@ public class RawCoil extends BaseEntity
     @Excel(name = "净重(kg)", width = 12)
     private BigDecimal netWeight;
 
+    /** 硬度(HV) */
+    @Excel(name = "硬度(HV)", width = 12)
+    private String hardness;
+
     /** 卷内径(mm) */
     @Excel(name = "卷内径(mm)", width = 12)
     private BigDecimal innerDia;
-
-    /** 炉批号 */
-    @Excel(name = "炉批号", width = 16)
-    private String heatNo;
 
     /** 到货日期 */
     @JsonFormat(pattern = "yyyy-MM-dd")
@@ -165,14 +165,14 @@ public class RawCoil extends BaseEntity
         this.innerDia = innerDia;
     }
 
-    public String getHeatNo()
+    public String getHardness()
     {
-        return heatNo;
+        return hardness;
     }
 
-    public void setHeatNo(String heatNo)
+    public void setHardness(String hardness)
     {
-        this.heatNo = heatNo;
+        this.hardness = hardness;
     }
 
     public Date getArriveDate()

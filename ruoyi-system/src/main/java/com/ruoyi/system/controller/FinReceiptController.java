@@ -1,5 +1,6 @@
 package com.ruoyi.system.controller;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import jakarta.servlet.http.HttpServletResponse;
@@ -74,6 +75,7 @@ public class FinReceiptController extends BaseController
     public AjaxResult add(@RequestBody FinReceipt finReceipt)
     {
         finReceipt.setCreateBy(getUsername());
+        finReceipt.setCreateTime(new Date());
         return toAjax(finReceiptService.insertFinReceipt(finReceipt));
     }
 

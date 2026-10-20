@@ -2,6 +2,7 @@ package com.ruoyi.system.controller;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import jakarta.servlet.http.HttpServletResponse;
@@ -142,6 +143,8 @@ public class SaleOrderController extends BaseController
     @PostMapping
     public AjaxResult add(@RequestBody SaleOrder saleOrder)
     {
+        saleOrder.setCreateBy(getUsername());
+        saleOrder.setCreateTime(new Date());
         return toAjax(saleOrderService.insertSaleOrder(saleOrder));
     }
 

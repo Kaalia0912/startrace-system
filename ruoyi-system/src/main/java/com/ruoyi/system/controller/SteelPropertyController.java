@@ -1,5 +1,6 @@
 package com.ruoyi.system.controller;
 
+import java.util.Date;
 import java.util.List;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -76,6 +77,8 @@ public class SteelPropertyController extends BaseController
     @PostMapping
     public AjaxResult add(@RequestBody SteelProperty steelProperty)
     {
+        steelProperty.setCreateBy(getUsername());
+        steelProperty.setCreateTime(new Date());
         return toAjax(steelPropertyService.insertSteelProperty(steelProperty));
     }
 

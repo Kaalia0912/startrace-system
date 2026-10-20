@@ -1,5 +1,6 @@
 package com.ruoyi.system.controller;
 
+import java.util.Date;
 import java.util.List;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -76,6 +77,8 @@ public class ToleranceController extends BaseController
     @PostMapping
     public AjaxResult add(@RequestBody Tolerance tolerance)
     {
+        tolerance.setCreateBy(getUsername());
+        tolerance.setCreateTime(new Date());
         return toAjax(toleranceService.insertTolerance(tolerance));
     }
 
