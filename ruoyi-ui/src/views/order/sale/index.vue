@@ -177,7 +177,7 @@
                 style="width: 100%"
                 @change="onCustomerChange"
               >
-                <el-option v-for="item in entOptions" :key="item.entId" :label="item.entName" :value="item.entName" />
+                <el-option v-for="item in customerOptions" :key="item.entId" :label="item.entName" :value="item.entName" />
               </el-select>
             </el-form-item>
           </el-col>
@@ -244,9 +244,9 @@
                 @change="onMaterialChange"
               >
                 <el-option
-                  v-for="item in materialOptions"
+                  v-for="item in filteredMaterialOptions"
                   :key="item.materialId"
-                  :label="item.materialCode + (item.material ? '（' + item.material + ' ' + (item.spec || '') + '）' : '')"
+                  :label="[item.materialCode, item.productName, item.material, item.spec].filter(Boolean).join(' · ')"
                   :value="item.materialCode"
                 />
               </el-select>
@@ -476,6 +476,35 @@ export default {
       rules: {}
     }
   },
+  computed: {
+    // 导入数据中存在同名占位企业，下拉中合并显示
+    customerOptions() {
+      const byName = new Map()
+      this.entOptions.forEach(item => {
+        if (!item.entName) {
+          return
+        }
+        const current = byName.get(item.entName)
+        const isPlaceholder = value => (value.remark || "").startsWith("来自产品资料")
+        if (!current || (isPlaceholder(current) && !isPlaceholder(item))) {
+          byName.set(item.entName, item)
+        }
+      })
+      return Array.from(byName.values()).sort((a, b) => a.entName.localeCompare(b.entName, "zh-CN"))
+    },
+    selectedCustomer() {
+      return this.customerOptions.find(item => item.entName === this.form.customerName)
+    },
+    // 选中客户后只显示该客户的产品（物料编码以客户代码开头）
+    filteredMaterialOptions() {
+      const ent = this.selectedCustomer
+      if (!ent || !ent.entCode) {
+        return this.materialOptions
+      }
+      const rows = this.materialOptions.filter(item => (item.materialCode || "").startsWith(ent.entCode))
+      return rows.length ? rows : this.materialOptions
+    }
+  },
   watch: {
     "form.quantity": function() {
       this.autoCalcAmount()
@@ -498,7 +527,7 @@ export default {
     },
     /** 加载物料下拉（物料主数据，仅正常状态） */
     loadMaterialOptions() {
-      listMaterial({ pageNum: 1, pageSize: 500, status: "0" }).then(response => {
+      listMaterial({ pageNum: 1, pageSize: 2000, status: "0" }).then(response => {
         this.materialOptions = response.rows || []
       })
     },
@@ -507,9 +536,18 @@ export default {
       if (!name) {
         return
       }
-      const ent = this.entOptions.find(item => item.entName === name)
+      const ent = this.customerOptions.find(item => item.entName === name)
       if (!ent) {
         return
+      }
+      if (this.form.materialCode && !this.form.materialCode.startsWith(ent.entCode || "")) {
+        this.form.materialCode = null
+        this.form.productName = ""
+        this.form.material = ""
+        this.form.spec = ""
+        this.form.hardness = ""
+        this.form.tensileStrength = ""
+        this.form.unit = ""
       }
       if (ent.address) {
         this.form.contactAddress = ent.address
