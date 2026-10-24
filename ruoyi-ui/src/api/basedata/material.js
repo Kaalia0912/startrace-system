@@ -42,3 +42,20 @@ export function delMaterial(materialId) {
     method: 'delete'
   })
 }
+
+// 导入物料主数据
+export function importMaterial(data) {
+  return request({
+    url: '/basedata/material/importData',
+    method: 'post',
+    data: data
+  })
+}
+
+// 下载物料导入模板
+export function importTemplate() {
+  return request({
+    url: '/basedata/material/importTemplate',
+    method: 'get'
+  })
+}

@@ -42,4 +42,13 @@ public interface IMaterialService
      * 批量删除物料主数据
      */
     public int deleteMaterialByMaterialIds(Long[] materialIds);
+
+    /**
+     * 导入物料主数据
+     *
+     * @param list 物料主数据列表
+     * @param updateSupport 是否更新已存在数据
+     * @return 导入结果
+     */
+    public String importMaterial(List<Material> list, boolean updateSupport);
 }

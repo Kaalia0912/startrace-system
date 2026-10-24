@@ -46,12 +46,13 @@ INSERT INTO sys_menu (menu_id, menu_name, parent_id, order_num, path, component,
 (2303, '物料新增', 2301, 2, '', '', NULL, '', 1, 0, 'F', '0', '0', 'basedata:material:add', '#', 'admin', sysdate(), '', NULL, NULL),
 (2304, '物料修改', 2301, 3, '', '', NULL, '', 1, 0, 'F', '0', '0', 'basedata:material:edit', '#', 'admin', sysdate(), '', NULL, NULL),
 (2305, '物料删除', 2301, 4, '', '', NULL, '', 1, 0, 'F', '0', '0', 'basedata:material:remove', '#', 'admin', sysdate(), '', NULL, NULL),
-(2306, '物料导出', 2301, 5, '', '', NULL, '', 1, 0, 'F', '0', '0', 'basedata:material:export', '#', 'admin', sysdate(), '', NULL, NULL);
+(2306, '物料导出', 2301, 5, '', '', NULL, '', 1, 0, 'F', '0', '0', 'basedata:material:export', '#', 'admin', sysdate(), '', NULL, NULL),
+(2307, '物料导入', 2301, 6, '', '', NULL, '', 1, 0, 'F', '0', '0', 'basedata:material:import', '#', 'admin', sysdate(), '', NULL, NULL);
 
 -- 3. 角色绑定（超级管理员 + 普通角色）
 INSERT INTO sys_role_menu (role_id, menu_id) VALUES
-(1, 2300), (1, 2301), (1, 2302), (1, 2303), (1, 2304), (1, 2305), (1, 2306),
-(2, 2300), (2, 2301), (2, 2302), (2, 2303), (2, 2304), (2, 2305), (2, 2306);
+(1, 2300), (1, 2301), (1, 2302), (1, 2303), (1, 2304), (1, 2305), (1, 2306), (1, 2307),
+(2, 2300), (2, 2301), (2, 2302), (2, 2303), (2, 2304), (2, 2305), (2, 2306), (2, 2307);
 
 -- 4. 初始基础数据（宝浦常用钢种，来自电子样本第 6/8 页）
 INSERT INTO md_material (material_code, product_name, material, spec, thickness, width, coil_inner_dia, unit, standard, hardness, tensile_strength, surface_ra, coil_weight_min, coil_weight_max, package_code, status, remark) VALUES

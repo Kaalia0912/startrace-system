@@ -32,6 +32,9 @@
       <el-col :span="1.5">
         <el-button type="warning" plain icon="el-icon-download" @click="handleExport" v-hasPermi="['basedata:material:export']">导出</el-button>
       </el-col>
+      <el-col :span="1.5">
+        <el-button type="success" plain icon="el-icon-upload2" @click="handleImport" v-hasPermi="['basedata:material:import']">导入</el-button>
+      </el-col>
       <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
     </el-row>
 
@@ -169,11 +172,38 @@
         <el-button @click="cancel">取 消</el-button>
       </div>
     </el-dialog>
+
+    <!-- 物料导入对话框 -->
+    <el-dialog title="物料主数据导入" :visible.sync="importOpen" width="420px" append-to-body>
+      <el-form ref="importForm" :model="importForm" label-width="130px">
+        <el-form-item label="更新已存在数据">
+          <el-checkbox v-model="importForm.updateSupport">存在则更新</el-checkbox>
+        </el-form-item>
+        <el-form-item label="物料文件">
+          <el-upload
+            ref="upload"
+            :auto-upload="false"
+            :limit="1"
+            accept=".xlsx, .xls"
+            :file-list="fileList"
+            :on-change="handleFileChange"
+            :on-remove="handleFileRemove"
+          >
+            <el-button size="small" type="primary">选择文件</el-button>
+          </el-upload>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button type="primary" @click="importFile">确 定</el-button>
+        <el-button type="success" @click="downloadTemplate">下载模板</el-button>
+        <el-button @click="importOpen = false">取 消</el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
 <script>
-import { listMaterial, getMaterial, delMaterial, addMaterial, updateMaterial } from "@/api/basedata/material";
+import { listMaterial, getMaterial, delMaterial, addMaterial, updateMaterial, importMaterial, importTemplate } from "@/api/basedata/material";
 
 export default {
   name: "Material",
@@ -185,6 +215,10 @@ export default {
       ids: [],
       // 非单个禁用
       multiple: true,
+      // 导入对话框
+      importOpen: false,
+      fileList: [],
+      importForm: { updateSupport: false },
       // 显示搜索条件
       showSearch: true,
       // 总条数
@@ -337,6 +371,46 @@ export default {
       this.download('basedata/material/export', {
         ...this.queryParams
       }, `material_${new Date().getTime()}.xlsx`)
+    },
+    /** 导入按钮操作 */
+    handleImport() {
+      this.importOpen = true;
+      this.fileList = [];
+      this.importForm.updateSupport = false;
+      if (this.$refs.upload) {
+        this.$refs.upload.clearFiles();
+      }
+    },
+    /** 文件选择 */
+    handleFileChange(file) {
+      this.fileList = [file];
+    },
+    /** 文件移除 */
+    handleFileRemove() {
+      this.fileList = [];
+    },
+    /** 提交导入 */
+    importFile() {
+      const file = this.fileList[0];
+      if (!file) {
+        this.$modal.msgError("请选择要导入的Excel文件");
+        return;
+      }
+      const formData = new FormData();
+      formData.append("file", file.raw);
+      formData.append("updateSupport", this.importForm.updateSupport);
+      importMaterial(formData).then(response => {
+        this.importOpen = false;
+        this.$modal.msgSuccess(response.msg);
+        this.getList();
+      });
+    },
+    /** 下载导入模板 */
+    downloadTemplate() {
+      importTemplate().then(response => {
+        this.$modal.msgSuccess("模板下载成功");
+        window.open(process.env.VUE_APP_BASE_API + response.data);
+      });
     }
   }
 };

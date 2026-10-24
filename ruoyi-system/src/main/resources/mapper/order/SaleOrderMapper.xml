@@ -177,6 +177,12 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         where order_id = #{orderId}
     </update>
 
+    <update id="updateSaleOrderOrderNo">
+        update ord_sale_order
+        set order_no = #{orderNo}
+        where order_id = #{orderId} and (order_no is null or order_no = '')
+    </update>
+
     <delete id="deleteSaleOrderByOrderId" parameterType="Long">
         delete from ord_sale_order where order_id = #{orderId}
     </delete>

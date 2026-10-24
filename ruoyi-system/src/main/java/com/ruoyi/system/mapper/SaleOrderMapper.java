@@ -2,6 +2,7 @@ package com.ruoyi.system.mapper;
 
 import java.util.List;
 import java.util.Map;
+import org.apache.ibatis.annotations.Param;
 import com.ruoyi.system.domain.SaleOrder;
 
 /**
@@ -40,6 +41,11 @@ public interface SaleOrderMapper
      * 修改销售订单
      */
     public int updateSaleOrder(SaleOrder saleOrder);
+
+    /**
+     * 新增订单后写入自动生成的订单号
+     */
+    public int updateSaleOrderOrderNo(@Param("orderId") Long orderId, @Param("orderNo") String orderNo);
 
     /**
      * 批量删除销售订单

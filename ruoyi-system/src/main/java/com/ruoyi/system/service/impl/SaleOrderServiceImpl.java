@@ -2,11 +2,13 @@ package com.ruoyi.system.service.impl;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import com.ruoyi.common.exception.ServiceException;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.system.mapper.SaleOrderMapper;
@@ -55,9 +57,22 @@ public class SaleOrderServiceImpl implements ISaleOrderService
      * 新增销售订单
      */
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public int insertSaleOrder(SaleOrder saleOrder)
     {
-        return saleOrderMapper.insertSaleOrder(saleOrder);
+        int rows = saleOrderMapper.insertSaleOrder(saleOrder);
+        if (StringUtils.isBlank(saleOrder.getOrderNo()))
+        {
+            Date orderDate = saleOrder.getOrderDate() == null ? new Date() : saleOrder.getOrderDate();
+            String orderNo = "SO" + new SimpleDateFormat("yyyyMMdd").format(orderDate)
+                    + String.format("%06d", saleOrder.getOrderId());
+            saleOrder.setOrderNo(orderNo);
+            if (saleOrderMapper.updateSaleOrderOrderNo(saleOrder.getOrderId(), orderNo) != 1)
+            {
+                throw new ServiceException("订单号生成失败");
+            }
+        }
+        return rows;
     }
 
     /**
@@ -102,20 +117,22 @@ public class SaleOrderServiceImpl implements ISaleOrderService
             int rowNo = i + 1;
             try
             {
-                if (StringUtils.isEmpty(order.getOrderNo()))
+                if (StringUtils.isBlank(order.getOrderNo()))
                 {
-                    throw new ServiceException("订单号为空");
+                    // 导入时不填写订单号，保存后自动生成
+                    order.setOrderNo(null);
                 }
                 // 金额为空且数量单价齐全时自动计算
                 if (order.getAmount() == null && order.getQuantity() != null && order.getUnitPrice() != null)
                 {
                     order.setAmount(order.getQuantity().multiply(order.getUnitPrice()).setScale(2, RoundingMode.HALF_UP));
                 }
-                List<SaleOrder> existList = saleOrderMapper.selectSaleOrderByOrderNo(order.getOrderNo());
+                List<SaleOrder> existList = StringUtils.isBlank(order.getOrderNo()) ? null
+                        : saleOrderMapper.selectSaleOrderByOrderNo(order.getOrderNo());
                 if (existList == null || existList.size() == 0)
                 {
                     order.setCreateTime(new Date());
-                    saleOrderMapper.insertSaleOrder(order);
+                    insertSaleOrder(order);
                     successNum++;
                     successMsg.append("<br/>").append(successNum).append("、第 ").append(rowNo).append(" 行（订单号 ")
                             .append(order.getOrderNo()).append("）导入成功");

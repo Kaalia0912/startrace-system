@@ -111,7 +111,7 @@ public class SaleOrderController extends BaseController
         // 模板自带一行自编示例数据（勿取自真实订单），便于参照格式填写
         List<SaleOrder> demoList = new ArrayList<SaleOrder>();
         SaleOrder demo = new SaleOrder();
-        demo.setOrderNo("EX-20260907-001");
+        // 订单号留空时，导入保存后由系统自动生成
         demo.setOrderDate(java.sql.Date.valueOf("2026-09-07"));
         demo.setCustomerName("示例不锈钢贸易有限公司");
         demo.setContactPerson("王示例");
@@ -128,7 +128,7 @@ public class SaleOrderController extends BaseController
         demo.setUnitPrice(new BigDecimal("13200"));
         demo.setAmount(new BigDecimal("132000"));
         demo.setDeliveryDate(java.sql.Date.valueOf("2026-09-30"));
-        demo.setRemark("示例数据行，正式导入前请删除本行");
+        demo.setRemark("示例数据行，正式导入前请删除本行；订单号留空将自动生成");
         demoList.add(demo);
         AjaxResult result = util.exportExcel(demoList, "销售订单数据");
         // ExcelUtil 把模板文件名放在 msg 中，转为可访问的相对路径返回给前端
