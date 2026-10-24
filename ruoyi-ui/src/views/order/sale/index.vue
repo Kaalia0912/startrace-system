@@ -38,6 +38,12 @@
           style="width: 150px"
         />
       </el-form-item>
+      <el-form-item label="资料状态" prop="incompleteOnly">
+        <el-select v-model="queryParams.incompleteOnly" clearable placeholder="全部订单" style="width: 130px">
+          <el-option label="全部订单" :value="null" />
+          <el-option label="资料待完善" :value="true" />
+        </el-select>
+      </el-form-item>
       <el-form-item>
         <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
         <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">重置</el-button>
@@ -466,7 +472,8 @@ export default {
         orderNo: null,
         customerName: null,
         productName: null,
-        orderDate: null
+        orderDate: null,
+        incompleteOnly: null
       },
       // 表单参数
       form: {},
@@ -511,6 +518,9 @@ export default {
     },
     "form.unitPrice": function() {
       this.autoCalcAmount()
+    },
+    "$route.query"() {
+      this.handleWorkspaceAction()
     }
   },
   created() {
@@ -518,21 +528,16 @@ export default {
     this.loadMaterialOptions()
     this.handleWorkspaceAction()
   },
-  watch: {
-    "$route.query"() {
-      this.handleWorkspaceAction()
-    }
-  },
   methods: {
     /** 首页快捷入口：新增、批量导入或带订单号筛选 */
     handleWorkspaceAction() {
-      const { action, orderNo } = this.$route.query
+      const { action, orderNo, incompleteOnly } = this.$route.query
+      this.queryParams.orderNo = orderNo || null
+      this.queryParams.incompleteOnly = incompleteOnly === "true" ? true : null
       if (action === "add") {
         this.handleAdd()
       } else if (action === "import") {
         this.handleImport()
-      } else if (orderNo) {
-        this.queryParams.orderNo = orderNo
       }
       this.getList()
     },

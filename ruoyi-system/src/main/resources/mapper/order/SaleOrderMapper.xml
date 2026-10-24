@@ -46,6 +46,9 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="productName != null  and productName != ''"> and product_name like concat('%', #{productName}, '%')</if>
             <if test="materialCode != null  and materialCode != ''"> and material_code like concat('%', #{materialCode}, '%')</if>
             <if test="orderDate != null"> and order_date = #{orderDate}</if>
+            <if test="incompleteOnly != null and incompleteOnly">
+                and (customer_name is null or customer_name = '' or amount is null or delivery_date is null)
+            </if>
         </where>
         order by order_date desc, order_id desc
     </select>

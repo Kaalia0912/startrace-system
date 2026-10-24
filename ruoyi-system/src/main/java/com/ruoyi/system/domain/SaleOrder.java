@@ -92,6 +92,9 @@ public class SaleOrder extends BaseEntity
     @Excel(name = "备注", width = 30)
     private String remark;
 
+    /** 仅查询资料未填完整的订单（非数据库字段） */
+    private Boolean incompleteOnly;
+
     public Long getOrderId()
     {
         return orderId;
@@ -280,5 +283,15 @@ public class SaleOrder extends BaseEntity
     public void setRemark(String remark)
     {
         this.remark = remark;
+    }
+
+    public Boolean getIncompleteOnly()
+    {
+        return incompleteOnly;
+    }
+
+    public void setIncompleteOnly(Boolean incompleteOnly)
+    {
+        this.incompleteOnly = incompleteOnly;
     }
 }

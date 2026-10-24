@@ -4,8 +4,10 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -119,12 +121,14 @@ public class SaleOrderServiceImpl implements ISaleOrderService
      * @return 结果
      */
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public String importSaleOrder(List<SaleOrder> list, boolean updateSupport)
     {
         if (list == null || list.size() == 0)
         {
             throw new ServiceException("导入数据不能为空");
         }
+        Set<String> orderNosInFile = new HashSet<String>();
         int successNum = 0;
         int failureNum = 0;
         StringBuilder successMsg = new StringBuilder();
@@ -132,7 +136,7 @@ public class SaleOrderServiceImpl implements ISaleOrderService
         for (int i = 0; i < list.size(); i++)
         {
             SaleOrder order = list.get(i);
-            int rowNo = i + 1;
+            int rowNo = i + 2;
             try
             {
                 if (StringUtils.isBlank(order.getOrderNo()))
@@ -140,35 +144,46 @@ public class SaleOrderServiceImpl implements ISaleOrderService
                     // 导入时不填写订单号，保存后自动生成
                     order.setOrderNo(null);
                 }
+                else
+                {
+                    order.setOrderNo(order.getOrderNo().trim());
+                }
+                if (order.getQuantity() != null && order.getQuantity().compareTo(BigDecimal.ZERO) < 0)
+                {
+                    throw new ServiceException("数量不能为负数");
+                }
+                if (order.getUnitPrice() != null && order.getUnitPrice().compareTo(BigDecimal.ZERO) < 0)
+                {
+                    throw new ServiceException("单价不能为负数");
+                }
+                if (order.getAmount() != null && order.getAmount().compareTo(BigDecimal.ZERO) < 0)
+                {
+                    throw new ServiceException("金额不能为负数");
+                }
                 // 金额为空且数量单价齐全时自动计算
                 if (order.getAmount() == null && order.getQuantity() != null && order.getUnitPrice() != null)
                 {
                     order.setAmount(order.getQuantity().multiply(order.getUnitPrice()).setScale(2, RoundingMode.HALF_UP));
                 }
-                List<SaleOrder> existList = StringUtils.isBlank(order.getOrderNo()) ? null
-                        : saleOrderMapper.selectSaleOrderByOrderNo(order.getOrderNo());
-                if (existList == null || existList.size() == 0)
+                if (order.getOrderNo() != null)
                 {
-                    order.setCreateTime(new Date());
-                    insertSaleOrder(order);
-                    successNum++;
-                    successMsg.append("<br/>").append(successNum).append("、第 ").append(rowNo).append(" 行（订单号 ")
-                            .append(order.getOrderNo()).append("）导入成功");
-                }
-                else if (updateSupport)
-                {
-                    order.setOrderId(existList.get(0).getOrderId());
-                    order.setUpdateTime(new Date());
-                    saleOrderMapper.updateSaleOrder(order);
-                    successNum++;
-                    successMsg.append("<br/>").append(successNum).append("、第 ").append(rowNo).append(" 行（订单号 ")
-                            .append(order.getOrderNo()).append("）更新成功");
-                }
-                else
-                {
-                    failureNum++;
-                    failureMsg.append("<br/>").append(failureNum).append("、第 ").append(rowNo).append(" 行（订单号 ")
-                            .append(order.getOrderNo()).append("）已存在");
+                    if (!orderNosInFile.add(order.getOrderNo()))
+                    {
+                        throw new ServiceException("订单号在文件中重复");
+                    }
+                    List<SaleOrder> existList = saleOrderMapper.selectSaleOrderByOrderNo(order.getOrderNo());
+                    if (existList != null && existList.size() > 1)
+                    {
+                        throw new ServiceException("订单号存在多条历史记录，请先清理重复数据");
+                    }
+                    if (existList != null && existList.size() == 1)
+                    {
+                        if (!updateSupport)
+                        {
+                            throw new ServiceException("订单号已存在");
+                        }
+                        order.setOrderId(existList.get(0).getOrderId());
+                    }
                 }
             }
             catch (Exception e)
@@ -182,6 +197,33 @@ public class SaleOrderServiceImpl implements ISaleOrderService
         {
             failureMsg.insert(0, "很抱歉，导入失败！共 " + failureNum + " 条数据格式不正确，错误如下：");
             throw new ServiceException(failureMsg.toString());
+        }
+        for (int i = 0; i < list.size(); i++)
+        {
+            SaleOrder order = list.get(i);
+            int rowNo = i + 2;
+            try
+            {
+                if (order.getOrderId() == null)
+                {
+                    order.setCreateTime(new Date());
+                    insertSaleOrder(order);
+                    successMsg.append("<br/>").append(successNum + 1).append("、第 ").append(rowNo)
+                            .append(" 行（订单号 ").append(order.getOrderNo()).append("）导入成功");
+                }
+                else
+                {
+                    order.setUpdateTime(new Date());
+                    saleOrderMapper.updateSaleOrder(order);
+                    successMsg.append("<br/>").append(successNum + 1).append("、第 ").append(rowNo)
+                            .append(" 行（订单号 ").append(order.getOrderNo()).append("）更新成功");
+                }
+                successNum++;
+            }
+            catch (Exception e)
+            {
+                throw new ServiceException("第 " + rowNo + " 行写入失败：" + e.getMessage()).setDetailMessage(e.getMessage());
+            }
         }
         successMsg.insert(0, "恭喜您，数据已全部导入成功！共 " + successNum + " 条，数据如下：");
         return successMsg.toString();

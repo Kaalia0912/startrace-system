@@ -79,7 +79,7 @@
             v-if="incompleteOrderCount > 0"
             type="button"
             class="attention-row attention-row--warning"
-            @click="openOrders"
+            @click="openIncompleteOrders"
           >
             <span class="attention-icon"><i class="el-icon-warning-outline"></i></span>
             <span class="attention-copy">
@@ -226,6 +226,9 @@ export default {
     },
     openOrders() {
       this.$router.push({ path: "/order/sale" })
+    },
+    openIncompleteOrders() {
+      this.$router.push({ path: "/order/sale", query: { incompleteOnly: "true" } })
     },
     openSale(action) {
       this.$router.push({ path: "/order/sale", query: { action, t: Date.now() } })
