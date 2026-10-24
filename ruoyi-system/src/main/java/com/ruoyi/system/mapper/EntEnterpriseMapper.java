@@ -1,7 +1,6 @@
 package com.ruoyi.system.mapper;
 
 import java.util.List;
-import java.util.Map;
 import com.ruoyi.system.domain.EntEnterprise;
 
 /**
@@ -59,38 +58,4 @@ public interface EntEnterpriseMapper
      */
     public EntEnterprise checkEntCodeUnique(String entCode);
 
-    /**
-     * 按企业类型统计
-     * 
-     * @return 统计结果
-     */
-    public List<Map<String, Object>> selectCountByEntType();
-
-    /**
-     * 按行业统计
-     * 
-     * @return 统计结果
-     */
-    public List<Map<String, Object>> selectCountByIndustry();
-
-    /**
-     * 按规模统计
-     * 
-     * @return 统计结果
-     */
-    public List<Map<String, Object>> selectCountByScale();
-
-    /**
-     * 按状态统计
-     * 
-     * @return 统计结果
-     */
-    public List<Map<String, Object>> selectCountByStatus();
-
-    /**
-     * 汇总统计
-     * 
-     * @return 汇总结果
-     */
-    public Map<String, Object> selectSummary();
 }

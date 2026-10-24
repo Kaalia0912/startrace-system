@@ -516,9 +516,26 @@ export default {
   created() {
     this.loadEntOptions()
     this.loadMaterialOptions()
-    this.getList()
+    this.handleWorkspaceAction()
+  },
+  watch: {
+    "$route.query"() {
+      this.handleWorkspaceAction()
+    }
   },
   methods: {
+    /** 首页快捷入口：新增、批量导入或带订单号筛选 */
+    handleWorkspaceAction() {
+      const { action, orderNo } = this.$route.query
+      if (action === "add") {
+        this.handleAdd()
+      } else if (action === "import") {
+        this.handleImport()
+      } else if (orderNo) {
+        this.queryParams.orderNo = orderNo
+      }
+      this.getList()
+    },
     /** 加载客户下拉（企业档案） */
     loadEntOptions() {
       listEnterprise({ pageNum: 1, pageSize: 500 }).then(response => {

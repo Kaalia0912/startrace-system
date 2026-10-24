@@ -1,330 +1,793 @@
 <template>
-  <div class="dashboard-home">
-    <!-- 顶部横幅 -->
-    <div class="hero-banner">
-      <div class="hero-overlay"></div>
-      <div class="hero-content">
-        <h2 class="hero-greet">{{ greeting }}，{{ name }}</h2>
-        <p class="hero-date">{{ today }} · 欢迎回来</p>
+  <div class="business-home" v-loading="loading">
+    <section class="masthead">
+      <div class="masthead-copy">
+        <div class="eyebrow"><span></span>STARTrace · 经营工作台</div>
+        <h1>{{ greeting }}，{{ displayName }}</h1>
+        <p>{{ today }}，订单、客户与交期信息已汇总。</p>
       </div>
+      <div class="masthead-actions">
+        <el-button icon="el-icon-document" @click="openOrders">订单台账</el-button>
+        <el-button type="primary" icon="el-icon-plus" @click="openSale('add')">新增订单</el-button>
+      </div>
+    </section>
+
+    <section class="metric-grid" aria-label="本月经营指标">
+      <button
+        v-for="item in metrics"
+        :key="item.label"
+        type="button"
+        class="metric-card"
+        :class="'metric-card--' + item.tone"
+        @click="openOrders"
+      >
+        <span class="metric-topline">
+          <span class="metric-icon"><i :class="item.icon"></i></span>
+          <span class="metric-label">{{ item.label }}</span>
+        </span>
+        <strong class="metric-value" :title="item.title">{{ item.value }}</strong>
+        <span class="metric-hint">{{ item.hint }}</span>
+      </button>
+    </section>
+
+    <div class="work-grid">
+      <el-card shadow="never" class="panel recent-panel">
+        <div slot="header" class="panel-header">
+          <div>
+            <h2>近期订单</h2>
+            <p>按订单日期和录入顺序展示最近 6 条</p>
+          </div>
+          <el-button type="text" @click="openOrders">查看全部</el-button>
+        </div>
+
+        <el-table :data="recentOrders" class="order-table" @row-click="openRecentOrder">
+          <el-table-column label="订单号" prop="orderNo" min-width="150" :show-overflow-tooltip="true" />
+          <el-table-column label="客户" prop="customerName" min-width="150" :show-overflow-tooltip="true" />
+          <el-table-column label="产品" prop="productName" min-width="150" :show-overflow-tooltip="true" />
+          <el-table-column label="数量" min-width="100" align="right">
+            <template slot-scope="scope">{{ formatQuantity(scope.row) }}</template>
+          </el-table-column>
+          <el-table-column label="金额（元）" min-width="120" align="right">
+            <template slot-scope="scope">{{ formatAmount(scope.row.amount) }}</template>
+          </el-table-column>
+          <el-table-column label="交期" prop="deliveryDate" min-width="105" />
+          <el-table-column label="" width="54" align="right">
+            <template>
+              <i class="el-icon-arrow-right row-arrow"></i>
+            </template>
+          </el-table-column>
+
+          <div slot="empty" class="empty-state">
+            <i class="el-icon-document-add"></i>
+            <strong>还没有销售订单</strong>
+            <p>录入第一张订单后，经营数据会自动汇总到这里。</p>
+            <el-button type="primary" plain size="small" @click.stop="openSale('add')">新增订单</el-button>
+          </div>
+        </el-table>
+      </el-card>
+
+      <aside class="side-stack">
+        <el-card shadow="never" class="panel attention-panel">
+          <div slot="header" class="panel-header compact-header">
+            <div>
+              <h2>需要关注</h2>
+              <p>订单资料与交期提示</p>
+            </div>
+          </div>
+
+          <button
+            v-if="incompleteOrderCount > 0"
+            type="button"
+            class="attention-row attention-row--warning"
+            @click="openOrders"
+          >
+            <span class="attention-icon"><i class="el-icon-warning-outline"></i></span>
+            <span class="attention-copy">
+              <strong>{{ incompleteOrderCount }} 张订单资料待完善</strong>
+              <small>客户、金额或交期至少一项未填写</small>
+            </span>
+          </button>
+          <div v-else class="attention-row attention-row--clear">
+            <span class="attention-icon"><i class="el-icon-circle-check"></i></span>
+            <span class="attention-copy">
+              <strong>订单基础资料完整</strong>
+              <small>当前没有客户、金额或交期缺失提示</small>
+            </span>
+          </div>
+
+          <div class="delivery-note">
+            <span>未来 30 天交期</span>
+            <strong>{{ upcomingDeliveryCount }}</strong>
+            <small>按交期日期统计，不包含订单完成状态</small>
+          </div>
+        </el-card>
+
+        <el-card shadow="never" class="panel action-panel">
+          <div slot="header" class="panel-header compact-header">
+            <div>
+              <h2>快捷操作</h2>
+              <p>从经营工作台直接开始</p>
+            </div>
+          </div>
+
+          <div class="action-grid">
+            <button
+              v-for="item in actionEntries"
+              :key="item.label"
+              type="button"
+              class="action-tile"
+              @click="handleAction(item)"
+            >
+              <span class="action-icon"><i :class="item.icon"></i></span>
+              <span class="action-copy">
+                <strong>{{ item.label }}</strong>
+                <small>{{ item.description }}</small>
+              </span>
+              <i class="el-icon-arrow-right action-arrow"></i>
+            </button>
+          </div>
+        </el-card>
+      </aside>
     </div>
-
-    <!-- 统计卡片 -->
-    <el-row :gutter="16" class="mt16">
-      <el-col :span="6" v-for="item in statCards" :key="item.label">
-        <el-card shadow="hover" class="stat-card" @click.native="goStat(item.path)">
-          <div class="stat-card-inner">
-            <div class="stat-icon" :style="{ background: item.bg, color: item.color }">
-              <i :class="item.icon"></i>
-            </div>
-            <div class="stat-info">
-              <div class="stat-num">{{ item.value }}</div>
-              <div class="stat-label">{{ item.label }}</div>
-            </div>
-          </div>
-        </el-card>
-      </el-col>
-    </el-row>
-
-    <!-- 快捷入口 -->
-    <el-row :gutter="16" class="mt16">
-      <el-col :span="8" v-for="entry in quickEntries" :key="entry.title">
-        <el-card shadow="hover" class="quick-card" @click.native="$router.push(entry.path)">
-          <div class="quick-inner">
-            <div class="quick-icon" :style="{ background: entry.bg, color: entry.color }">
-              <i :class="entry.icon"></i>
-            </div>
-            <div class="quick-text">
-              <div class="quick-title">{{ entry.title }}</div>
-              <div class="quick-desc">{{ entry.desc }}</div>
-            </div>
-            <i class="el-icon-arrow-right quick-arrow"></i>
-          </div>
-        </el-card>
-      </el-col>
-    </el-row>
-
-    <!-- 最近企业 + 行业分布 -->
-    <el-row :gutter="16" class="mt16">
-      <el-col :span="14">
-        <el-card shadow="never" header="最近新增企业">
-          <el-table :data="recentList" size="small" @row-click="goDetail" class="recent-table">
-            <el-table-column label="企业名称" prop="entName" :show-overflow-tooltip="true" min-width="140" />
-            <el-table-column label="行业" prop="industry" width="100">
-              <template slot-scope="scope">
-                <dict-tag :options="industryOptions" :value="scope.row.industry" />
-              </template>
-            </el-table-column>
-            <el-table-column label="类型" prop="entType" width="110">
-              <template slot-scope="scope">
-                <dict-tag :options="entTypeOptions" :value="scope.row.entType" />
-              </template>
-            </el-table-column>
-            <el-table-column label="注册资本(万)" prop="registeredCapital" width="110" />
-            <el-table-column label="操作" width="60" align="center">
-              <template slot-scope="scope">
-                <el-button size="mini" type="text" @click.stop="goDetail(scope.row)">详情</el-button>
-              </template>
-            </el-table-column>
-          </el-table>
-        </el-card>
-      </el-col>
-      <el-col :span="10">
-        <el-card shadow="never" header="行业分布">
-          <div ref="industryChartRef" class="mini-chart"></div>
-        </el-card>
-      </el-col>
-    </el-row>
   </div>
 </template>
 
 <script>
-import * as echarts from "echarts";
-import { getStats } from "@/api/enterprise/dashboard";
-import { listEnterprise } from "@/api/enterprise/enterprise";
-import { listContact } from "@/api/enterprise/contact";
+import { getSaleOrderDashboard } from "@/api/order/saleOrder"
 
 export default {
   name: "Index",
   data() {
     return {
-      name: "",
+      loading: true,
+      dashboard: {},
+      recentOrders: [],
       today: "",
       greeting: "",
-      summary: {},
-      contactTotal: 0,
-      recentList: [],
-      industryOptions: [],
-      entTypeOptions: [],
-      statCards: [
-        { label: "企业总数", value: 0, icon: "el-icon-office-building", color: "#2b6de8", bg: "#2b6de822", path: "/enterprise/enterprise?status=all" },
-        { label: "联系人", value: 0, icon: "el-icon-user", color: "#5b8ff0", bg: "#5b8ff022", path: "/enterprise/contact" },
-        { label: "在营企业", value: 0, icon: "el-icon-circle-check", color: "#e3be5a", bg: "#e3be5a22", path: "/enterprise/enterprise?status=0" },
-        { label: "覆盖行业", value: 0, icon: "el-icon-collection", color: "#c99a2e", bg: "#c99a2e22", path: "/enterprise/dashboard" }
-      ],
-      quickEntries: [
-        { title: "企业档案", desc: "管理企业基本信息", icon: "el-icon-office-building", color: "#2b6de8", bg: "#2b6de81a", path: "/enterprise/enterprise" },
-        { title: "企业联系人", desc: "维护企业联系人", icon: "el-icon-user", color: "#5b8ff0", bg: "#5b8ff01a", path: "/enterprise/contact" },
-        { title: "统计看板", desc: "数据图表分析", icon: "el-icon-pie-chart", color: "#e3be5a", bg: "#e3be5a1a", path: "/enterprise/dashboard" }
+      actionEntries: [
+        { label: "新增销售订单", description: "录入客户与产品信息", icon: "el-icon-plus", path: "/order/sale", action: "add" },
+        { label: "批量导入订单", description: "下载模板后批量录入", icon: "el-icon-upload2", path: "/order/sale", action: "import" },
+        { label: "维护物料主数据", description: "统一产品、材质与规格", icon: "el-icon-box", path: "/basedata/material" },
+        { label: "查看客户档案", description: "维护客户与联系人", icon: "el-icon-office-building", path: "/enterprise/enterprise" }
       ]
-    };
+    }
+  },
+  computed: {
+    displayName() {
+      return this.$store.getters.nickName || this.$store.getters.name || "用户"
+    },
+    incompleteOrderCount() {
+      return Number(this.dashboard.incompleteOrderCount || 0)
+    },
+    upcomingDeliveryCount() {
+      return Number(this.dashboard.upcomingDeliveryCount || 0)
+    },
+    metrics() {
+      const monthOrderCount = Number(this.dashboard.monthOrderCount || 0)
+      const monthAmount = Number(this.dashboard.monthAmount || 0)
+      const monthCustomerCount = Number(this.dashboard.monthCustomerCount || 0)
+      return [
+        {
+          label: "本月订单",
+          value: this.formatCount(monthOrderCount),
+          hint: this.compareHint(monthOrderCount, this.dashboard.lastMonthOrderCount, "上月无订单"),
+          icon: "el-icon-document",
+          tone: "blue"
+        },
+        {
+          label: "本月订单额（元）",
+          value: this.formatCompactAmount(monthAmount),
+          title: this.formatAmount(monthAmount),
+          hint: this.compareHint(monthAmount, this.dashboard.lastMonthAmount, "上月无金额"),
+          icon: "el-icon-coin",
+          tone: "amber"
+        },
+        {
+          label: "本月客户",
+          value: this.formatCount(monthCustomerCount),
+          hint: "按客户名称去重统计",
+          icon: "el-icon-user",
+          tone: "teal"
+        },
+        {
+          label: "30 天内交期",
+          value: this.formatCount(this.upcomingDeliveryCount),
+          hint: "从今天起 30 天内的订单",
+          icon: "el-icon-date",
+          tone: "slate"
+        }
+      ]
+    }
   },
   created() {
-    this.initGreeting();
-    this.loadDicts();
-    this.loadData();
-  },
-  mounted() {
-    this.$nextTick(() => {});
+    this.initGreeting()
+    this.loadDashboard()
   },
   methods: {
     initGreeting() {
-      this.name = this.$store.getters.nickName || this.$store.getters.name || "admin";
-      const now = new Date();
-      const h = now.getHours();
-      if (h < 6) this.greeting = "夜深了";
-      else if (h < 9) this.greeting = "早上好";
-      else if (h < 12) this.greeting = "上午好";
-      else if (h < 14) this.greeting = "中午好";
-      else if (h < 18) this.greeting = "下午好";
-      else this.greeting = "晚上好";
-      this.today = now.getFullYear() + "年" + (now.getMonth() + 1) + "月" + now.getDate() + "日";
+      const now = new Date()
+      const hour = now.getHours()
+      this.greeting = hour < 6 ? "夜深了" : hour < 12 ? "上午好" : hour < 14 ? "中午好" : hour < 18 ? "下午好" : "晚上好"
+      const weekdays = ["星期日", "星期一", "星期二", "星期三", "星期四", "星期五", "星期六"]
+      this.today = `${now.getFullYear()}年${now.getMonth() + 1}月${now.getDate()}日 · ${weekdays[now.getDay()]}`
     },
-    loadDicts() {
-      this.getDicts("enterprise_industry").then(response => {
-        this.industryOptions = response.data;
-        if (this.pendingIndustry) {
-          this.renderIndustryChart(this.pendingIndustry);
-        }
-      });
-      this.getDicts("enterprise_type").then(response => {
-        this.entTypeOptions = response.data;
-      });
+    loadDashboard() {
+      this.loading = true
+      getSaleOrderDashboard().then(response => {
+        const data = response.data || {}
+        this.dashboard = data
+        this.recentOrders = data.recentOrders || []
+      }).catch(() => {
+        this.dashboard = {}
+        this.recentOrders = []
+      }).finally(() => {
+        this.loading = false
+      })
     },
-    loadData() {
-      // 统计
-      getStats().then(response => {
-        const data = response;
-        this.summary = data.summary || {};
-        const status = data.status || [];
-        const statusMap = Object.fromEntries(status.map(s => [s.name, Number(s.value)]));
-        this.statCards[0].value = this.summary.total || 0;
-        this.statCards[2].value = statusMap["0"] || 0;
-        this.statCards[3].value = this.summary.industryCount || 0;
-        // 行业迷你图
-        this.pendingIndustry = data.industry || [];
-        this.renderIndustryChart(this.pendingIndustry);
-      });
-      // 联系人总数
-      listContact({ pageNum: 1, pageSize: 1 }).then(response => {
-        this.statCards[1].value = response.total || 0;
-      });
-      // 最近企业
-      listEnterprise({ pageNum: 1, pageSize: 5 }).then(response => {
-        this.recentList = response.rows || [];
-      });
+    openOrders() {
+      this.$router.push({ path: "/order/sale" })
     },
-    renderIndustryChart(industry) {
-      if (!this.$refs.industryChartRef) return;
-      const chart = echarts.init(this.$refs.industryChartRef);
-      const dict = Object.fromEntries(this.industryOptions.map(d => [d.dictValue, d.dictLabel]));
-      const indData = industry.map(item => ({ name: dict[item.name] || item.name || "未填写", value: Number(item.value) }));
-      chart.setOption({
-        tooltip: { trigger: "axis" },
-        grid: { left: 40, right: 16, top: 16, bottom: 30 },
-        xAxis: {
-          type: "category",
-          data: indData.map(d => d.name),
-          axisLabel: { rotate: 30, interval: 0, fontSize: 10 }
-        },
-        yAxis: { type: "value", minInterval: 1 },
-        series: [{
-          type: "bar",
-          barWidth: 22,
-          itemStyle: {
-            color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-              { offset: 0, color: "#e3be5a" },
-              { offset: 1, color: "#c99a2e" }
-            ]),
-            borderRadius: [4, 4, 0, 0]
-          },
-          label: { show: true, position: "top", fontSize: 10 },
-          data: indData.map(d => d.value)
-        }]
-      });
+    openSale(action) {
+      this.$router.push({ path: "/order/sale", query: { action, t: Date.now() } })
     },
-    goStat(path) {
-      if (path) this.$router.push(path);
+    openRecentOrder(row) {
+      const query = row.orderNo ? { orderNo: row.orderNo } : {}
+      this.$router.push({ path: "/order/sale", query })
     },
-    goDetail(row) {
-      this.$router.push("/enterprise/enterprise/detail/" + row.entId);
+    handleAction(item) {
+      if (item.action) {
+        this.openSale(item.action)
+        return
+      }
+      this.$router.push({ path: item.path })
+    },
+    compareHint(current, previous, emptyHint) {
+      const currentValue = Number(current || 0)
+      const previousValue = Number(previous || 0)
+      if (previousValue <= 0) {
+        return emptyHint
+      }
+      const percent = ((currentValue - previousValue) / previousValue) * 100
+      if (Math.abs(percent) < 0.05) {
+        return "与上月持平"
+      }
+      return `较上月${percent > 0 ? "增加" : "减少"} ${Math.abs(percent).toFixed(1)}%`
+    },
+    formatCount(value) {
+      return Number(value || 0).toLocaleString("zh-CN")
+    },
+    formatCompactAmount(value) {
+      const amount = Number(value || 0)
+      if (amount >= 100000000) {
+        return `${(amount / 100000000).toFixed(2)} 亿`
+      }
+      if (amount >= 10000) {
+        return `${(amount / 10000).toFixed(1)} 万`
+      }
+      return this.formatAmount(amount)
+    },
+    formatAmount(value) {
+      if (value === null || value === undefined || value === "") {
+        return ""
+      }
+      return Number(value).toLocaleString("zh-CN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+    },
+    formatQuantity(row) {
+      if (row.quantity === null || row.quantity === undefined || row.quantity === "") {
+        return ""
+      }
+      const quantity = Number(row.quantity).toLocaleString("zh-CN", { maximumFractionDigits: 3 })
+      return row.unit ? `${quantity} ${row.unit}` : quantity
     }
   }
-};
+}
 </script>
 
 <style scoped>
-.dashboard-home {
-  margin: -20px;
+.business-home {
+  --ink-900: #17212b;
+  --ink-700: #34424f;
+  --ink-500: #687784;
+  --line: #e3e8ed;
+  --surface: #ffffff;
+  --page: #f3f5f7;
+  --blue: #1f5f9f;
+  --blue-soft: #eaf2fa;
+  --amber: #b77820;
+  --amber-soft: #fbf3e5;
+  --teal: #27776b;
+  --teal-soft: #eaf5f2;
+  min-height: calc(100vh - 84px);
+  padding: 20px;
+  color: var(--ink-900);
+  background:
+    linear-gradient(135deg, rgba(31, 95, 159, 0.04), transparent 34%),
+    var(--page);
 }
-/* 顶部横幅 */
-.hero-banner {
+
+.masthead {
   position: relative;
-  height: 180px;
-  background: url("/img/home.jpg") center/cover no-repeat;
-  border-radius: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 32px;
+  min-height: 170px;
+  padding: 32px 36px;
   overflow: hidden;
+  color: #fff;
+  background: linear-gradient(112deg, #17212b 0%, #243441 62%, #354653 100%);
+  border-radius: 10px;
 }
-.hero-overlay {
+
+.masthead::after {
   position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: linear-gradient(90deg, rgba(8, 18, 45, 0.82) 0%, rgba(8, 18, 45, 0.45) 60%, rgba(8, 18, 45, 0.25) 100%);
+  right: 18%;
+  bottom: -88px;
+  width: 320px;
+  height: 220px;
+  content: "";
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  border-radius: 50%;
+  box-shadow: 0 0 0 34px rgba(255, 255, 255, 0.035), 0 0 0 68px rgba(255, 255, 255, 0.02);
 }
-.hero-content {
+
+.masthead-copy,
+.masthead-actions {
   position: relative;
   z-index: 1;
-  padding: 46px 32px;
 }
-.hero-greet {
-  margin: 0 0 10px 0;
-  color: #fff;
-  font-size: 30px;
-  font-weight: 800;
-  letter-spacing: 2px;
-  text-shadow: 0 2px 14px rgba(0, 0, 0, 0.55);
-}
-.hero-date {
-  margin: 0;
-  color: #e3be5a;
-  font-size: 14px;
-  letter-spacing: 1px;
-}
-/* 间距 */
-.mt16 {
-  margin-top: 16px;
-}
-/* 统计卡片 */
-.stat-card {
-  cursor: pointer;
-  border-radius: 12px;
-  transition: transform 0.2s;
-}
-.stat-card:hover {
-  transform: translateY(-3px);
-}
-.stat-card-inner {
+
+.eyebrow {
   display: flex;
   align-items: center;
-  gap: 14px;
+  gap: 10px;
+  margin-bottom: 16px;
+  color: #d8b66e;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
 }
-.stat-icon {
-  width: 52px;
-  height: 52px;
-  border-radius: 12px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 26px;
-  flex-shrink: 0;
+
+.eyebrow span {
+  width: 28px;
+  height: 2px;
+  background: #d8b66e;
 }
-.stat-num {
-  font-size: 26px;
-  font-weight: 800;
+
+.masthead h1 {
+  margin: 0 0 10px;
+  font-size: clamp(25px, 2.4vw, 34px);
   line-height: 1.2;
-  color: #1f2d3d;
+  letter-spacing: 0.02em;
 }
-.stat-label {
-  color: #909399;
-  font-size: 13px;
+
+.masthead p {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 14px;
 }
-/* 快捷入口 */
-.quick-card {
-  cursor: pointer;
-  border-radius: 12px;
-  transition: transform 0.2s, box-shadow 0.2s;
-}
-.quick-card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
-}
-.quick-inner {
+
+.masthead-actions {
   display: flex;
-  align-items: center;
-  gap: 14px;
-}
-.quick-icon {
-  width: 48px;
-  height: 48px;
-  border-radius: 12px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 24px;
   flex-shrink: 0;
+  gap: 10px;
 }
-.quick-title {
+
+.masthead-actions .el-button {
+  min-height: 40px;
+  padding-inline: 18px;
+  border-color: rgba(255, 255, 255, 0.24);
+  color: #fff;
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.masthead-actions .el-button:hover,
+.masthead-actions .el-button:focus {
+  border-color: rgba(255, 255, 255, 0.52);
+  color: #fff;
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.masthead-actions .el-button--primary {
+  border-color: #d8b66e;
+  color: #17212b;
+  background: #e3c37d;
+}
+
+.masthead-actions .el-button--primary:hover,
+.masthead-actions .el-button--primary:focus {
+  border-color: #edd49b;
+  color: #17212b;
+  background: #edd49b;
+}
+
+.metric-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+  margin-top: 14px;
+}
+
+.metric-card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  min-height: 152px;
+  padding: 20px;
+  text-align: left;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  box-shadow: 0 1px 2px rgba(23, 33, 43, 0.025);
+  cursor: pointer;
+  transition: transform 160ms ease, border-color 160ms ease, box-shadow 160ms ease;
+}
+
+.metric-card:hover {
+  border-color: #c8d1d9;
+  box-shadow: 0 8px 22px rgba(23, 33, 43, 0.08);
+  transform: translateY(-2px);
+}
+
+.metric-card:focus-visible,
+.action-tile:focus-visible,
+.attention-row:focus-visible {
+  outline: 2px solid var(--blue);
+  outline-offset: 2px;
+}
+
+.metric-topline {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+}
+
+.metric-icon {
+  display: grid;
+  width: 34px;
+  height: 34px;
+  place-items: center;
+  border-radius: 7px;
+  font-size: 17px;
+}
+
+.metric-label {
+  color: var(--ink-500);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.metric-value {
+  margin-top: 18px;
+  font-size: clamp(27px, 2.6vw, 36px);
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+  letter-spacing: -0.02em;
+}
+
+.metric-hint {
+  margin-top: auto;
+  padding-top: 14px;
+  color: #7e8c98;
+  font-size: 12px;
+}
+
+.metric-card--blue .metric-icon {
+  color: var(--blue);
+  background: var(--blue-soft);
+}
+
+.metric-card--amber .metric-icon {
+  color: var(--amber);
+  background: var(--amber-soft);
+}
+
+.metric-card--teal .metric-icon {
+  color: var(--teal);
+  background: var(--teal-soft);
+}
+
+.metric-card--slate .metric-icon {
+  color: var(--ink-700);
+  background: #edf1f4;
+}
+
+.work-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.8fr) minmax(300px, 0.8fr);
+  gap: 14px;
+  margin-top: 14px;
+}
+
+.panel {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+}
+
+.panel >>> .el-card__header {
+  padding: 18px 20px;
+  border-bottom-color: var(--line);
+}
+
+.panel >>> .el-card__body {
+  padding: 0;
+}
+
+.panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.panel-header h2 {
+  margin: 0;
+  color: var(--ink-900);
   font-size: 16px;
   font-weight: 700;
-  color: #1f2d3d;
 }
-.quick-desc {
+
+.panel-header p {
+  margin: 5px 0 0;
+  color: var(--ink-500);
   font-size: 12px;
-  color: #909399;
-  margin-top: 3px;
 }
-.quick-arrow {
-  margin-left: auto;
-  color: #c0c4cc;
-}
-/* 迷你图 */
-.mini-chart {
-  width: 100%;
-  height: 285px;
-}
-.recent-table {
+
+.order-table {
   cursor: pointer;
+}
+
+.order-table >>> th.el-table__cell {
+  height: 43px;
+  color: #5d6b77;
+  font-size: 12px;
+  font-weight: 600;
+  background: #fafbfc;
+}
+
+.order-table >>> td.el-table__cell {
+  height: 54px;
+  color: #26333e;
+}
+
+.order-table >>> .el-table__row:hover > td.el-table__cell {
+  background: #f5f8fa;
+}
+
+.row-arrow {
+  color: #a8b3bc;
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 46px 20px 40px;
+  color: var(--ink-500);
+}
+
+.empty-state > i {
+  margin-bottom: 14px;
+  color: #a8b4bd;
+  font-size: 38px;
+}
+
+.empty-state strong {
+  color: var(--ink-700);
+  font-size: 15px;
+}
+
+.empty-state p {
+  margin: 7px 0 16px;
+  font-size: 13px;
+}
+
+.side-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.compact-header {
+  padding-bottom: 0;
+}
+
+.attention-panel >>> .el-card__body,
+.action-panel >>> .el-card__body {
+  padding: 16px 18px 18px;
+}
+
+.attention-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  min-height: 68px;
+  padding: 12px;
+  text-align: left;
+  border: 1px solid transparent;
+  border-radius: 7px;
+}
+
+button.attention-row {
+  cursor: pointer;
+}
+
+.attention-row--warning {
+  color: #74460d;
+  background: #fdf6e9;
+  border-color: #f1ddb6;
+}
+
+.attention-row--clear {
+  color: #1e6257;
+  background: #f0f8f5;
+  border-color: #d6ebe5;
+}
+
+.attention-icon {
+  display: grid;
+  width: 34px;
+  height: 34px;
+  flex: 0 0 34px;
+  place-items: center;
+  font-size: 20px;
+}
+
+.attention-copy {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.attention-copy strong {
+  font-size: 13px;
+}
+
+.attention-copy small {
+  color: inherit;
+  font-size: 12px;
+  line-height: 1.45;
+  opacity: 0.72;
+}
+
+.delivery-note {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 4px 12px;
+  margin-top: 16px;
+  padding: 15px 2px 0;
+  border-top: 1px solid var(--line);
+}
+
+.delivery-note span {
+  color: var(--ink-500);
+  font-size: 13px;
+}
+
+.delivery-note strong {
+  color: var(--ink-900);
+  font-size: 20px;
+  line-height: 1;
+}
+
+.delivery-note small {
+  grid-column: 1 / -1;
+  margin-top: 5px;
+  color: #87949f;
+  font-size: 11px;
+}
+
+.action-grid {
+  display: grid;
+  gap: 4px;
+}
+
+.action-tile {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  width: 100%;
+  min-height: 58px;
+  padding: 8px 6px;
+  text-align: left;
+  background: transparent;
+  border: 0;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.action-tile:hover {
+  background: #f5f7f9;
+}
+
+.action-icon {
+  display: grid;
+  width: 34px;
+  height: 34px;
+  flex: 0 0 34px;
+  place-items: center;
+  color: var(--ink-700);
+  background: #eef2f5;
+  border-radius: 6px;
+  font-size: 16px;
+}
+
+.action-copy {
+  display: flex;
+  min-width: 0;
+  flex: 1;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.action-copy strong {
+  color: #26333e;
+  font-size: 13px;
+}
+
+.action-copy small {
+  overflow: hidden;
+  color: #85919b;
+  font-size: 11px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.action-arrow {
+  color: #b1bbc3;
+}
+
+@media (max-width: 1180px) {
+  .metric-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .work-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .side-stack {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 720px) {
+  .business-home {
+    padding: 12px;
+  }
+
+  .masthead {
+    align-items: flex-start;
+    flex-direction: column;
+    min-height: 0;
+    padding: 26px 22px;
+  }
+
+  .masthead-actions {
+    width: 100%;
+  }
+
+  .masthead-actions .el-button {
+    flex: 1;
+  }
+
+  .metric-grid,
+  .side-stack {
+    grid-template-columns: 1fr;
+  }
+
+  .metric-card {
+    min-height: 138px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .metric-card {
+    transition: none;
+  }
 }
 </style>

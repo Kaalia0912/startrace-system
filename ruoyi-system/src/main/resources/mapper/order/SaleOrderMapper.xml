@@ -100,6 +100,25 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         order by orderDate desc
     </select>
 
+    <!-- 经营工作台汇总：按订单日期统计，日期为空时回退到创建日期 -->
+    <select id="selectSaleDashboardSummary" resultType="java.util.HashMap">
+        select count(*) as totalOrderCount,
+               count(case when date_format(coalesce(order_date, date(create_time)), '%Y-%m') = date_format(curdate(), '%Y-%m') then 1 end) as monthOrderCount,
+               ifnull(sum(case when date_format(coalesce(order_date, date(create_time)), '%Y-%m') = date_format(curdate(), '%Y-%m') then amount else 0 end), 0) as monthAmount,
+               count(case when date_format(coalesce(order_date, date(create_time)), '%Y-%m') = date_format(date_sub(curdate(), interval 1 month), '%Y-%m') then 1 end) as lastMonthOrderCount,
+               ifnull(sum(case when date_format(coalesce(order_date, date(create_time)), '%Y-%m') = date_format(date_sub(curdate(), interval 1 month), '%Y-%m') then amount else 0 end), 0) as lastMonthAmount,
+               count(distinct case when date_format(coalesce(order_date, date(create_time)), '%Y-%m') = date_format(curdate(), '%Y-%m') and customer_name is not null and customer_name &lt;&gt; '' then customer_name end) as monthCustomerCount,
+               count(case when delivery_date between curdate() and date_add(curdate(), interval 30 day) then 1 end) as upcomingDeliveryCount,
+               count(case when customer_name is null or customer_name = '' or amount is null or delivery_date is null then 1 end) as incompleteOrderCount
+        from ord_sale_order
+    </select>
+
+    <select id="selectRecentSaleOrders" resultMap="SaleOrderResult">
+        <include refid="selectSaleOrderVo"/>
+        order by order_date desc, order_id desc
+        limit 6
+    </select>
+
     <insert id="insertSaleOrder" parameterType="SaleOrder" useGeneratedKeys="true" keyProperty="orderId">
         insert into ord_sale_order
         <trim prefix="(" suffix=")" suffixOverrides=",">

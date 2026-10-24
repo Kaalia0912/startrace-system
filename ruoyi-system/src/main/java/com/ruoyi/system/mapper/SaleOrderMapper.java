@@ -33,6 +33,16 @@ public interface SaleOrderMapper
     public List<Map<String, Object>> selectOrderProgress(SaleOrder saleOrder);
 
     /**
+     * 经营工作台汇总数据
+     */
+    public Map<String, Object> selectSaleDashboardSummary();
+
+    /**
+     * 经营工作台近期订单
+     */
+    public List<SaleOrder> selectRecentSaleOrders();
+
+    /**
      * 新增销售订单
      */
     public int insertSaleOrder(SaleOrder saleOrder);

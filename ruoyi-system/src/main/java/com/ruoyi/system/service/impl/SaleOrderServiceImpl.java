@@ -54,6 +54,24 @@ public class SaleOrderServiceImpl implements ISaleOrderService
     }
 
     /**
+     * 经营工作台汇总数据
+     */
+    @Override
+    public Map<String, Object> selectSaleDashboardSummary()
+    {
+        return saleOrderMapper.selectSaleDashboardSummary();
+    }
+
+    /**
+     * 经营工作台近期订单
+     */
+    @Override
+    public List<SaleOrder> selectRecentSaleOrders()
+    {
+        return saleOrderMapper.selectRecentSaleOrders();
+    }
+
+    /**
      * 新增销售订单
      */
     @Override

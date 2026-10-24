@@ -174,24 +174,4 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <include refid="selectEntEnterpriseVo"/>
         where ent_code = #{entCode} limit 1
     </select>
-
-    <select id="selectCountByEntType" resultType="java.util.Map">
-        select ent_type as "name", count(*) as "value" from ent_enterprise group by ent_type
-    </select>
-
-    <select id="selectCountByIndustry" resultType="java.util.Map">
-        select industry as "name", count(*) as "value" from ent_enterprise group by industry
-    </select>
-
-    <select id="selectCountByScale" resultType="java.util.Map">
-        select scale as "name", count(*) as "value" from ent_enterprise group by scale
-    </select>
-
-    <select id="selectCountByStatus" resultType="java.util.Map">
-        select status as "name", count(*) as "value" from ent_enterprise group by status
-    </select>
-
-    <select id="selectSummary" resultType="java.util.Map">
-        select count(*) as total, ifnull(sum(registered_capital),0) as totalCapital, ifnull(round(avg(employee_count),0),0) as avgEmployee, count(distinct industry) as industryCount from ent_enterprise
-    </select>
 </mapper>

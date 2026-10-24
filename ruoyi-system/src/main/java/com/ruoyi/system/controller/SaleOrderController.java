@@ -74,6 +74,18 @@ public class SaleOrderController extends BaseController
     }
 
     /**
+     * 经营工作台数据
+     */
+    @PreAuthorize("@ss.hasPermi('order:sale:list')")
+    @GetMapping("/dashboard")
+    public AjaxResult dashboard()
+    {
+        Map<String, Object> dashboard = saleOrderService.selectSaleDashboardSummary();
+        dashboard.put("recentOrders", saleOrderService.selectRecentSaleOrders());
+        return success(dashboard);
+    }
+
+    /**
      * 导出销售订单列表
      */
     @PreAuthorize("@ss.hasPermi('order:sale:export')")

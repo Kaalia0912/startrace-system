@@ -17,6 +17,14 @@ export function getSaleOrder(orderId) {
   })
 }
 
+// 查询经营工作台数据
+export function getSaleOrderDashboard() {
+  return request({
+    url: '/order/sale/dashboard',
+    method: 'get'
+  })
+}
+
 // 新增销售订单
 export function addSaleOrder(data) {
   return request({
